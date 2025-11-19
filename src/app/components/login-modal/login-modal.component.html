@@ -1,0 +1,11 @@
+<div *ngIf="isAuthenticated; else noAuth">
+  <p>Is Authenticated: {{ isAuthenticated }}</p>
+  <pre class="border rounded p-2">{{ userDataJson() }}</pre>
+  <button class="btn btn-outline-secondary w-100" (click)="logout()">Logout</button>
+</div>
+
+<ng-template #noAuth>
+  <button class="btn btn-primary w-100" (click)="login()">Login</button>
+  <hr />
+  <button class="btn btn-link w-100" (click)="closeModal()">Cerrar</button>
+</ng-template>

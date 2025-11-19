@@ -1,0 +1,111 @@
+<div class="container">
+    <h1 class="text-center">Unidades</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+                {{ errorMessage }}
+            </div>
+            <ng-container *ngIf="!isLoadingUnidades; else unidadesLoading">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Número de unidad</th>
+                            <th>Tipo de unidad</th>
+                            <th>Metraje</th>
+                            <th>Precio de venta</th>
+                            <th>Estado</th>
+                            <th>Proyecto</th>
+                            <th>Cliente</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let unidad of unidades">
+                            <td>{{ unidad.numero_unidad }}</td>
+                            <td>{{ unidad.tipo_unidad }}</td>
+                            <td>{{ unidad.metraje }}</td>
+                            <td>{{ unidad.precio_venta }}</td>
+                            <td>{{ unidad.estado }}</td>
+                            <td>{{ getProyectoNombre(unidad.proyecto_id) }}</td>
+                            <td>{{ getClienteRut(unidad.cliente_id) }}</td>
+                            <td>
+                                <button class="btn btn-primary" (click)="editarUnidad(unidad)">Editar</button>
+                                <button class="btn btn-danger" (click)="eliminarUnidad(unidad)">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </ng-container>
+            <ng-template #unidadesLoading>
+                <div class="text-center my-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 mb-0">Cargando unidades...</p>
+                </div>
+            </ng-template>
+            <button class="btn btn-success"
+                (click)="mostrarFormulario = true; modoEdicion = false; unidadForm.reset()">Crear Unidad</button>
+            <div *ngIf="mostrarFormulario">
+                <form [formGroup]="unidadForm">
+                    <div class="form-group">
+                        <label>Número de unidad:</label>
+                        <input formControlName="numero_unidad" type="text" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Unidad:</label>
+                        <select formControlName="tipo_unidad" class="form-control">
+                            <option value="Departamento">Departamento</option>
+                            <option value="Casa">Casa</option>
+                            <option value="Parcela">Parcela</option>
+                            <option value="Terreno">Terreno</option>
+                            <option value="Oficina">Oficina</option>
+                            <option value="Local comercial">Local comercial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Metraje:</label>
+                        <input formControlName="metraje" type="number" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Precio de venta:</label>
+                        <input formControlName="precio_venta" type="number" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado:</label>
+                        <select formControlName="estado" class="form-control">
+                            <option value="Disponible">Disponible</option>
+                            <option value="Reservado">Reservado</option>
+                            <option value="Vendido">Vendido</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Proyecto:</label>
+                        <select formControlName="proyecto_id" class="form-control" [disabled]="isLoadingProyectos">
+                            <option *ngIf="isLoadingProyectos" disabled>Cargando proyectos...</option>
+                            <option *ngFor="let proyecto of proyectos" [value]="proyecto.id">{{ proyecto.nombre }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cliente:</label>
+                        <select formControlName="cliente_id" class="form-control" [disabled]="isLoadingClientes">
+                            <option value="">Sin cliente</option>
+                            <option *ngIf="isLoadingClientes" disabled>Cargando clientes...</option>
+                            <option *ngFor="let cliente of clientes" [value]="cliente.id">
+                                {{ cliente.rut }} - {{ cliente.nombre }} {{ cliente.apellido }}
+                            </option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" (click)="crearUnidad()">Guardar</button>
+                    <button class="btn btn-secondary" (click)="mostrarFormulario = false">Cancelar</button>
+                </form>
+            </div>
+            <div *ngIf="unidadCreada">
+                <p>Unidad creada con éxito</p>
+            </div>
+            <div *ngIf="unidadEditada">
+                <p>Unidad editada con éxito</p>
+            </div>
+        </div>
+    </div>
+</div>

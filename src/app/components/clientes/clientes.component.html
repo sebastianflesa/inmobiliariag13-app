@@ -1,0 +1,92 @@
+<div class="container">
+    <h1 class="text-center">Clientes</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!--<div class="form-group">
+                <input type="text" [(ngModel)]="rutBuscar" placeholder="Buscar por RUT" class="form-control">
+                <button class="btn btn-primary" (click)="buscarCliente()">Buscar</button>
+            </div> -->
+            <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+                {{ errorMessage }}
+            </div>
+            <ng-container *ngIf="!isLoading; else clientesLoading">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let cliente of clientes">
+                            <td>{{ cliente.nombre }}</td>
+                            <td>{{ cliente.apellido }}</td>
+                            <td>{{ cliente.email }}</td>
+                            <td>
+                                <button class="btn btn-primary" (click)="editarCliente(cliente)">Editar</button>
+                                <button class="btn btn-danger" (click)="eliminarCliente(cliente)">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </ng-container>
+            <ng-template #clientesLoading>
+                <div class="text-center my-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 mb-0">Cargando clientes...</p>
+                </div>
+            </ng-template>
+            <button class="btn btn-success" (click)="mostrarFormularioCrear()">Crear Cliente</button>
+            <div *ngIf="mostrarFormulario">
+                <form [formGroup]="clienteForm">
+                    <div class="form-group">
+                        <label>RUT:</label>
+                        <input formControlName="rut" type="text" class="form-control">
+                        <div
+                            *ngIf="clienteForm.get('rut')?.invalid && (clienteForm.get('rut')?.dirty || clienteForm.get('rut')?.touched)">
+                            <div *ngIf="clienteForm.get('rut')?.errors?.['required']" class="text-danger">El RUT es
+                                requerido</div>
+                            <div *ngIf="clienteForm.get('rut')?.errors?.['pattern']" class="text-danger">El RUT debe
+                                tener un formato válido (ej: 12345678-9)</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre:</label>
+                        <input formControlName="nombre" type="text" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Apellido:</label>
+                        <input formControlName="apellido" type="text" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input formControlName="email" type="email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono:</label>
+                        <input formControlName="telefono" type="text" class="form-control">
+                        <div
+                            *ngIf="clienteForm.get('telefono')?.invalid && (clienteForm.get('telefono')?.dirty || clienteForm.get('telefono')?.touched)">
+                            <div *ngIf="clienteForm.get('telefono')?.errors?.['required']" class="text-danger">El
+                                teléfono es requerido</div>
+                            <div *ngIf="clienteForm.get('telefono')?.errors?.['pattern']" class="text-danger">El
+                                teléfono debe tener 9 dígitos</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" (click)="crearCliente()">Guardar</button>
+                    <button class="btn btn-secondary" (click)="mostrarFormulario = false">Cancelar</button>
+                </form>
+            </div>
+            <div *ngIf="clienteCreado">
+                <p>Cliente Registrado</p>
+            </div>
+            <div *ngIf="clienteEditado">
+                <p>Cliente Editado</p>
+            </div>
+        </div>
+    </div>
+</div>

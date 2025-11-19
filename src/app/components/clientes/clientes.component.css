@@ -1,0 +1,21 @@
+.container {
+    margin-top: 20px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.btn {
+    margin: 5px;
+}
+
+.text-danger {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+}

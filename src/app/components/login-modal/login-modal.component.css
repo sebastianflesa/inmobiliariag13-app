@@ -1,0 +1,30 @@
+.modal-dialog {
+    max-width: 500px;
+    /* ajusta el ancho máximo del modal */
+}
+
+.modal-content {
+    padding: 20px;
+    /* agrega un poco de espacio alrededor del contenido */
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 80%;
+    margin: 0 auto;
+}
+
+button[type="submit"] {
+    width: 50%;
+    margin: 0 auto;
+}
