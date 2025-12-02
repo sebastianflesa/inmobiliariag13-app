@@ -1,0 +1,17 @@
+.result-container {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.success {
+    color: lime;
+}
+
+.error {
+    color: red;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+}

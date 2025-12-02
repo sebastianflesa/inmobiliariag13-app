@@ -1,0 +1,29 @@
+<section class="app-page">
+  <div class="app-card narrow">
+    <div class="app-card-header">
+      <div>
+        <h1 class="app-card-title">Mi Perfil</h1>
+        <p class="app-card-subtitle">Consulta la informacion asociada a tu cuenta.</p>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="status muted">Cargando perfil...</div>
+
+    <div *ngIf="!loading && hasProfile" class="detail-list">
+      <div class="detail-row">
+        <span class="detail-label">Nombre</span>
+        <span class="detail-value">{{ userName || 'Sin nombre' }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Correo</span>
+        <span class="detail-value">{{ userEmail || 'Sin correo' }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && !hasProfile" class="status error">
+      No pudimos cargar tu perfil. Intenta iniciar sesion nuevamente.
+    </div>
+
+    <a routerLink="/" class="back-link">Volver al inicio</a>
+  </div>
+</section>

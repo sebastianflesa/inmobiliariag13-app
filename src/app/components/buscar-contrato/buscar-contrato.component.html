@@ -1,0 +1,38 @@
+<div class="buscar-wrapper">
+
+    <h2>Buscar contrato por RUT</h2>
+
+    <input type="text" [(ngModel)]="rut" placeholder="Ingresa RUT sin puntos" class="input-rut" />
+
+    <button (click)="buscarRut()" class="btn-buscar">Buscar</button>
+
+    <div *ngIf="loading">Buscando...</div>
+
+    <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
+    <!-- CLIENTE ENCONTRADO -->
+    <div *ngIf="cliente" class="cliente-info">
+        <h3>Cliente encontrado:</h3>
+        <p><strong>Nombre:</strong> {{ cliente.nombre }}</p>
+        <p><strong>RUT:</strong> {{ cliente.rut }}</p>
+    </div>
+
+    <!-- LISTA DE CONTRATOS -->
+    <div *ngIf="contratos.length > 0" class="contratos-lista">
+        <h3>Contratos asociados:</h3>
+
+        <div class="contrato-card" *ngFor="let c of contratos">
+            <p><strong>ID:</strong> {{ c.id }}</p>
+            <p><strong>Proyecto:</strong> {{ c.unidad?.proyecto?.nombre || 'Sin proyecto' }}</p>
+            <p><strong>Unidad:</strong> {{ c.unidad?.numero_unidad || 'Sin unidad' }}</p>
+
+
+
+            <p><strong>Fecha Inicio:</strong> {{ c.fecha_inicio | date }}</p>
+
+            <button (click)="pagar(c)" class="btn-pagar">Pagar</button>
+        </div>
+
+    </div>
+
+</div>

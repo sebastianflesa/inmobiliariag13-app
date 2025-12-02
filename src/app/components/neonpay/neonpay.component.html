@@ -1,0 +1,28 @@
+<div class="neonpay-wrapper">
+
+    <!-- Paso 1: Tarjeta animada -->
+    <div *ngIf="step === 1 && contratoId != null">
+        <app-neon-card [contratoId]="contratoId" (paymentStarted)="onPaymentStarted($event)">
+        </app-neon-card>
+    </div>
+
+    <!-- Paso 2: Pantalla PIN (usa paymentId) -->
+    <div *ngIf="step === 2 && paymentId">
+        <app-pin-screen [sessionId]="paymentId" (pinValidated)="onPinValidated($event)">
+        </app-pin-screen>
+    </div>
+
+    <!-- Paso 3: OTP -->
+    <div *ngIf="step === 3 && paymentId">
+        <app-otp-screen [sessionId]="paymentId" (otpValidated)="onOtpValidated($event)">
+        </app-otp-screen>
+    </div>
+
+    <!-- Paso 4: Resultado -->
+    <div *ngIf="step === 4">
+        <app-result-screen [result]="paymentResult?.status === 'approved' ? 'approved' : 'rejected'"
+            (restartFlow)="restart()">
+        </app-result-screen>
+    </div>
+
+</div>

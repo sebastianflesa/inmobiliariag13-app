@@ -1,0 +1,12 @@
+.otp-container {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.otp-input {
+    font-size: 26px;
+    letter-spacing: 4px;
+    width: 160px;
+    text-align: center;
+    margin-bottom: 20px;
+}

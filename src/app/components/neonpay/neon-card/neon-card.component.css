@@ -1,0 +1,40 @@
+.card-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.neon-card {
+    width: 320px;
+    height: 200px;
+    margin: 0 auto 20px auto;
+    padding: 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #111, #222);
+    box-shadow: 0 0 10px #0ff, 0 0 40px #0ff inset;
+    color: #0ff;
+    font-family: monospace;
+    position: relative;
+}
+
+.card-chip {
+    width: 50px;
+    height: 35px;
+    background: gold;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.card-number {
+    font-size: 20px;
+    margin: 20px 0;
+    letter-spacing: 2px;
+}
+
+.btn-pagar {
+    padding: 12px 20px;
+    background: #00eaff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}

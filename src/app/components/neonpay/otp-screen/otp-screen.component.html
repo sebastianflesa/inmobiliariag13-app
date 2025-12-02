@@ -1,0 +1,15 @@
+<div class="otp-container">
+    <h2>Validación OTP</h2>
+
+    <button *ngIf="!generated" (click)="generarOtp()">
+        {{ loading ? 'Enviando OTP...' : 'Enviar OTP' }}
+    </button>
+
+    <div *ngIf="generated">
+        <input type="text" maxlength="6" [(ngModel)]="otp" class="otp-input" />
+
+        <button (click)="validarOtp()" [disabled]="loading">
+            {{ loading ? 'Validando...' : 'Validar OTP' }}
+        </button>
+    </div>
+</div>

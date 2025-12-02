@@ -1,0 +1,12 @@
+.pin-container {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.pin-input {
+    font-size: 28px;
+    width: 120px;
+    text-align: center;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+}

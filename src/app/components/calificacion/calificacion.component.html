@@ -1,0 +1,87 @@
+<div class="container mt-4">
+    <h2 class="mb-3">Gestión de Calificaciones</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Registrar Calificación</h5>
+
+            <form [formGroup]="califForm" (ngSubmit)="crearCalificacion()">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Contrato</label>
+                        <select class="form-select" formControlName="contrato_id">
+                            <option value="">Seleccione...</option>
+                            <option *ngFor="let c of contratos" [value]="c.id">
+                                {{ c.cliente?.nombre ? (c.cliente.nombre + ' ' + (c.cliente.apellido || '')) :
+                                (c.cliente_id || 'Contrato ' + c.id) }}
+                                — {{ c.unidad?.numero_unidad ? c.unidad.numero_unidad : (c.unidad_id || '') }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Puntaje</label>
+                        <select class="form-select" formControlName="puntaje">
+                            <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Hidden fields que el backend necesita -->
+                <input type="hidden" formControlName="cliente_id" />
+                <input type="hidden" formControlName="unidad_id" />
+                <input type="hidden" formControlName="proyecto_id" />
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Comentario (opc.)</label>
+                        <textarea formControlName="comentario" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+                <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+                <button class="btn btn-success" type="submit" [disabled]="saving">Registrar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Calificaciones</h5>
+
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Contrato</th>
+                        <th>Puntaje</th>
+                        <th>Comentario</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cal of calificaciones; let i = index">
+                        <td>{{ i + 1 }}</td>
+                        <td>
+                            {{ cal.contrato?.cliente?.nombre ? (cal.contrato.cliente.nombre + ' ' +
+                            (cal.contrato.cliente.apellido || '')) : (cal.contrato_id || 'Contrato ' +
+                            (cal.contrato?.id || '')) }}
+                        </td>
+                        <td>{{ cal.puntaje }}</td>
+                        <td>{{ cal.comentario || '—' }}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm"
+                                (click)="eliminarCalificacion(cal.id)">Eliminar</button>
+                        </td>
+                    </tr>
+
+                    <tr *ngIf="calificaciones.length === 0">
+                        <td colspan="5" class="text-center text-muted">No hay calificaciones registradas</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

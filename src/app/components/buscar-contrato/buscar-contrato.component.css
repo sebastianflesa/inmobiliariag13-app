@@ -1,0 +1,52 @@
+.buscar-wrapper {
+    width: 480px;
+    margin: 40px auto;
+    padding: 25px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+}
+
+.input-rut {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.btn-buscar {
+    margin-top: 12px;
+    width: 100%;
+    padding: 12px;
+    background: #0072ff;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.cliente-info,
+.contrato-card {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f7f7f7;
+    border-radius: 10px;
+}
+
+.btn-pagar {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    background: #00c853;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.error {
+    margin-top: 10px;
+    color: red;
+    font-weight: bold;
+}

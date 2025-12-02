@@ -1,0 +1,108 @@
+<div class="container mt-4">
+    <h2 class="mb-3">Gestión de Contratos</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Crear Contrato</h5>
+
+            <form [formGroup]="contratoForm" (ngSubmit)="crearContrato()">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Cliente</label>
+                        <select class="form-select" formControlName="cliente_id">
+                            <option value="">Seleccione...</option>
+                            <option *ngFor="let c of clientes" [value]="c.id">
+                                {{ c.nombre }} {{ c.apellido }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Unidad</label>
+                        <select class="form-select" formControlName="unidad_id">
+                            <option value="">Seleccione...</option>
+                            <option *ngFor="let u of unidades" [value]="u.id">
+                                {{ u.numero_unidad }} ({{ u.estado }})
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo Contrato</label>
+                        <select class="form-select" formControlName="tipo_contrato">
+                            <option value="arriendo">Arriendo</option>
+                            <option value="venta">Venta</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Fecha Inicio</label>
+                        <input type="date" formControlName="fecha_inicio" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Fecha Fin</label>
+                        <input type="date" formControlName="fecha_fin" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Monto Total</label>
+                        <input type="number" formControlName="monto_total" class="form-control" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success" [disabled]="saving">
+                    {{ saving ? 'Guardando...' : 'Crear Contrato' }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Contratos</h5>
+
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Unidad</th>
+                        <th>Estado</th>
+                        <th>Tipo</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let c of contratos; let i = index">
+                        <td>{{ i + 1 }}</td>
+                        <td>
+                            {{ c.cliente?.nombre ? (c.cliente.nombre + ' ' + (c.cliente.apellido || '')) : (c.cliente_id
+                            || '—') }}
+                        </td>
+                        <td>{{ c.unidad?.numero_unidad ? c.unidad.numero_unidad : (c.unidad_id || '—') }}</td>
+                        <td>{{ c.estado }}</td>
+                        <td>{{ c.tipo_contrato }}</td>
+                        <td>{{ c.fecha_inicio | date:'dd/MM/yyyy' }}</td>
+                        <td>{{ c.fecha_fin | date:'dd/MM/yyyy' }}</td>
+
+                        <td>
+                            <button class="btn btn-danger btn-sm" (click)="eliminarContrato(c.id)">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr *ngIf="contratos.length === 0">
+                        <td colspan="8" class="text-center text-muted">No hay contratos registrados</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
