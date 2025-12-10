@@ -17,22 +17,26 @@ export interface Cliente {
 export class ClienteService {
 
   private apiUrl = 'http://localhost:8000/api/clientes';
+  private readonly tokenKey = 'token';
   private token: string | null = null;
 
   constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
     if (isPlatformBrowser(this.platformId)) {
-      this.token = localStorage.getItem('token');
+      this.token = localStorage.getItem(this.tokenKey);
     }
   }
 
   public setToken(token: string): void {
     if (isPlatformBrowser(this.platformId)) {
       this.token = token;
-      localStorage.setItem('token', token);
+      localStorage.setItem(this.tokenKey, token);
     }
   }
 
   private getHeaders(): HttpHeaders {
+    if (isPlatformBrowser(this.platformId)) {
+      this.token = localStorage.getItem(this.tokenKey);
+    }
     return new HttpHeaders({
       'Authorization': `Bearer ${this.token}`,
       'Content-Type': 'application/json'

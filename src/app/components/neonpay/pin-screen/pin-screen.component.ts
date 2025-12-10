@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -5,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-pin-screen',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './pin-screen.component.html',
   styleUrls: ['./pin-screen.component.css']
 })
@@ -40,5 +41,19 @@ export class PinScreenComponent {
         this.pinValidated.emit(false);
       }
     });
+  }
+
+  // Agregar estos métodos a tu pin-screen.component.ts si quieres el teclado numérico
+
+  addDigit(digit: number) {
+    if (this.pin.length < 4 && !this.loading) {
+      this.pin += digit.toString();
+    }
+  }
+
+  clearPin() {
+    if (this.pin.length > 0) {
+      this.pin = this.pin.slice(0, -1); // Eliminar último dígito
+    }
   }
 }

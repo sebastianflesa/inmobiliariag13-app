@@ -1,90 +1,189 @@
-<div class="container">
-  <h1 class="text-center">Proyectos</h1>
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-        {{ errorMessage }}
+<section class="page-shell module-wrapper">
+  <div class="container">
+    <div class="module-header">
+      <div>
+        <p class="text-uppercase text-muted small mb-1">Gestion</p>
+        <h1 class="h3 mb-0">Proyectos</h1>
+        <p class="lead fs-6">Visualiza la cartera de proyectos y crea nuevos desarrollos desde una interfaz ordenada.</p>
       </div>
-      <ng-container *ngIf="!isLoading; else proyectosLoading">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Ubicación</th>
-              <th>Fecha de inicio</th>
-              <th>Fecha de fin</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let proyecto of proyectos">
-              <td>{{ proyecto.nombre }}</td>
-              <td>{{ proyecto.descripcion }}</td>
-              <td>{{ proyecto.ubicacion }}</td>
-              <td>{{ proyecto.fecha_inicio }}</td>
-              <td>{{ proyecto.fecha_fin }}</td>
-              <td>{{ proyecto.estado }}</td>
-              <td>
-                <button class="btn btn-primary" (click)="editarProyecto(proyecto)">Editar</button>
-                <button class="btn btn-danger" (click)="eliminarProyecto(proyecto)">Eliminar</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </ng-container>
-      <ng-template #proyectosLoading>
-        <div class="text-center my-4">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
+      <button class="btn btn-primary" (click)="mostrarFormularioCrear()">Nuevo proyecto</button>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-12" *ngIf="mostrarFormulario">
+        <div class="card module-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="card-title h5 mb-0">{{ modoEdicion ? 'Actualizar proyecto' : 'Crear proyecto' }}</h2>
+            <button class="btn btn-sm btn-outline-secondary" (click)="mostrarFormulario = false">Cerrar</button>
           </div>
-          <p class="mt-2 mb-0">Cargando proyectos...</p>
+          <div class="card-body">
+            <form class="row g-3" [formGroup]="proyectoForm">
+              <div class="col-md-6">
+                <label class="form-label">Nombre</label>
+                <input formControlName="nombre" type="text" class="form-control" />
+                <small class="text-danger" *ngIf="proyectoForm.get('nombre')?.hasError('required') && proyectoForm.get('nombre')?.touched">
+                  El nombre es requerido
+                </small>
+                <small class="text-danger" *ngIf="proyectoForm.get('nombre')?.hasError('minlength')">
+                  Debe tener al menos 3 caracteres
+                </small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Descripcion</label>
+                <input formControlName="descripcion" type="text" class="form-control" />
+                <small class="text-danger" *ngIf="proyectoForm.get('descripcion')?.hasError('required') && proyectoForm.get('descripcion')?.touched">
+                  La descripcion es requerida
+                </small>
+                <small class="text-danger" *ngIf="proyectoForm.get('descripcion')?.hasError('minlength')">
+                  Debe tener al menos 5 caracteres
+                </small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Ubicacion</label>
+                <input formControlName="ubicacion" type="text" class="form-control" />
+                <small class="text-danger" *ngIf="proyectoForm.get('ubicacion')?.hasError('required') && proyectoForm.get('ubicacion')?.touched">
+                  La ubicacion es requerida
+                </small>
+                <small class="text-danger" *ngIf="proyectoForm.get('ubicacion')?.hasError('minlength')">
+                  Debe tener al menos 3 caracteres
+                </small>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Fecha inicio</label>
+                <input formControlName="fecha_inicio" type="date" class="form-control" />
+                <small class="text-danger" *ngIf="proyectoForm.get('fecha_inicio')?.hasError('required') && proyectoForm.get('fecha_inicio')?.touched">
+                  La fecha de inicio es requerida
+                </small>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Fecha fin</label>
+                <input formControlName="fecha_fin" type="date" class="form-control" />
+                <small class="text-danger" *ngIf="proyectoForm.get('fecha_fin')?.hasError('required') && proyectoForm.get('fecha_fin')?.touched">
+                  La fecha de fin es requerida
+                </small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Estado</label>
+                <select formControlName="estado" class="form-select">
+                  <option value="En construccion">En construccion</option>
+                  <option value="En planificacion">En planificacion</option>
+                  <option value="Terminado">Terminado</option>
+                  <option value="En revision">En revision</option>
+                  <option value="Cancelado">Cancelado</option>
+                </select>
+                <small class="text-danger" *ngIf="proyectoForm.get('estado')?.hasError('required') && proyectoForm.get('estado')?.touched">
+                  El estado es requerido
+                </small>
+              </div>
+              <div class="col-12 d-flex gap-2">
+                <button type="button" class="btn btn-primary" (click)="crearProyecto()">Guardar</button>
+                <button type="button" class="btn btn-outline-secondary" (click)="mostrarFormulario = false">Cancelar</button>
+              </div>
+            </form>
+          </div>
         </div>
-      </ng-template>
-      <button class="btn btn-success" (click)="mostrarFormularioCrear()">Crear Proyecto</button>
-      <div *ngIf="mostrarFormulario">
-        <form [formGroup]="proyectoForm">
-          <div class="form-group">
-            <label>Nombre:</label>
-            <input formControlName="nombre" type="text" class="form-control">
-          </div>
-          <div class="form-group">
-            <label>Descripción:</label>
-            <input formControlName="descripcion" type="text" class="form-control">
-          </div>
-          <div class="form-group">
-            <label>Ubicación:</label>
-            <input formControlName="ubicacion" type="text" class="form-control">
-          </div>
-          <div class="form-group">
-            <label>Fecha de inicio:</label>
-            <input formControlName="fecha_inicio" type="date" class="form-control">
-          </div>
-          <div class="form-group">
-            <label>Fecha de fin:</label>
-            <input formControlName="fecha_fin" type="date" class="form-control">
-          </div>
-          <div class="form-group">
-            <label>Estado:</label>
-            <select formControlName="estado" class="form-control">
-              <option value="En construcción">En construcción</option>
-              <option value="En planificación">En planificación</option>
-              <option value="Terminado">Terminado</option>
-              <option value="En revisión">En revisión</option>
-              <option value="Cancelado">Cancelado</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" (click)="crearProyecto()">Guardar</button>
-          <button class="btn btn-secondary" (click)="mostrarFormulario = false">Cancelar</button>
-        </form>
       </div>
-      <div *ngIf="proyectoCreado">
-        <p>Proyecto Registrado</p>
+
+      <div class="col-12">
+        <div class="card module-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted small mb-1">Listado de proyectos</p>
+              <h2 class="card-title h5 mb-0">Resumen general</h2>
+            </div>
+            <span class="badge text-bg-primary-subtle text-primary">{{ proyectos.length || 0 }} proyectos</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="text-center py-4" *ngIf="loading">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+            <ng-container *ngIf="!loading">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Ubicacion</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Estado</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let proyecto of proyectos">
+                    <td class="fw-semibold">{{ proyecto.nombre }}</td>
+                    <td class="text-truncate" style="max-width: 180px;">{{ proyecto.descripcion }}</td>
+                    <td>{{ proyecto.ubicacion }}</td>
+                    <td>{{ proyecto.fecha_inicio }}</td>
+                    <td>{{ proyecto.fecha_fin }}</td>
+                    <td>
+                      <span class="status-badge bg-light text-primary">{{ proyecto.estado }}</span>
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group">
+                        <button class="btn btn-outline-primary btn-sm" (click)="editarProyecto(proyecto)">Editar</button>
+                        <button class="btn btn-outline-danger btn-sm" (click)="eliminarProyecto(proyecto)">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!proyectos?.length">
+                    <td colspan="7" class="text-center py-4 text-muted">Sin proyectos por ahora.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            </ng-container>
+          </div>
+        </div>
       </div>
-      <div *ngIf="proyectoEditado">
-        <p>Proyecto Editado</p>
+
+      <div class="col-12" *ngIf="proyectoCreado || proyectoEditado">
+        <div class="alert" [ngClass]="proyectoCreado ? 'alert-success' : 'alert-info'">
+          {{ proyectoCreado ? 'Proyecto registrado' : 'Proyecto editado' }}
+        </div>
       </div>
     </div>
+  </div>
+</section>
+
+<div class="blocking-overlay" *ngIf="saving">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Guardando...</span>
+      </div>
+      <h2 class="h6 mb-0">Guardando proyecto</h2>
+    </div>
+    <p class="mb-1">Estamos procesando la información del proyecto.</p>
+    <p class="text-muted small mb-0">Por favor espera, estamos procesando la solicitud.</p>
+  </div>
+</div>
+
+<div class="blocking-overlay" *ngIf="deleting">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Borrando...</span>
+      </div>
+      <h2 class="h6 mb-0">Borrando proyecto</h2>
+    </div>
+    <p class="mb-1">Estamos eliminando el registro seleccionado. Por favor espera...</p>
+    <p class="text-muted small mb-0">Esta ventana se cerrará al completar la operación.</p>
+  </div>
+</div>
+
+<div class="blocking-overlay" *ngIf="errorModalMessage">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <span class="text-danger fw-bold">!</span>
+      <h2 class="h6 mb-0 text-danger">No se pudo completar la operación</h2>
+    </div>
+    <p class="mb-2">{{ errorModalMessage }}</p>
+    <p class="text-muted small mb-3">El backend devolvió un error. Intenta nuevamente más tarde.</p>
+    <button type="button" class="btn btn-primary" (click)="cerrarErrorModal()">Entendido</button>
   </div>
 </div>

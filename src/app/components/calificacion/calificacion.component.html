@@ -1,87 +1,177 @@
-<div class="container mt-4">
-    <h2 class="mb-3">Gestión de Calificaciones</h2>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Registrar Calificación</h5>
-
-            <form [formGroup]="califForm" (ngSubmit)="crearCalificacion()">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Contrato</label>
-                        <select class="form-select" formControlName="contrato_id">
-                            <option value="">Seleccione...</option>
-                            <option *ngFor="let c of contratos" [value]="c.id">
-                                {{ c.cliente?.nombre ? (c.cliente.nombre + ' ' + (c.cliente.apellido || '')) :
-                                (c.cliente_id || 'Contrato ' + c.id) }}
-                                — {{ c.unidad?.numero_unidad ? c.unidad.numero_unidad : (c.unidad_id || '') }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Puntaje</label>
-                        <select class="form-select" formControlName="puntaje">
-                            <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Hidden fields que el backend necesita -->
-                <input type="hidden" formControlName="cliente_id" />
-                <input type="hidden" formControlName="unidad_id" />
-                <input type="hidden" formControlName="proyecto_id" />
-
-                <div class="row mb-3">
-                    <div class="col-md-12">
-                        <label class="form-label">Comentario (opc.)</label>
-                        <textarea formControlName="comentario" class="form-control" rows="3"></textarea>
-                    </div>
-                </div>
-
-                <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-                <div *ngIf="success" class="alert alert-success">{{ success }}</div>
-
-                <button class="btn btn-success" type="submit" [disabled]="saving">Registrar</button>
-            </form>
-        </div>
+<section class="page-shell module-wrapper">
+  <div class="container">
+    <div class="module-header">
+      <div>
+        <p class="text-uppercase text-muted small mb-1">Experiencia</p>
+        <h1 class="h3 mb-0">Calificaciones</h1>
+        <p class="lead fs-6">Centraliza los comentarios de clientes y revisa sus puntajes.</p>
+      </div>
+      <button class="btn btn-primary" type="button" (click)="toggleFormulario()">
+        {{ mostrarFormulario ? 'Ocultar formulario' : 'Nueva calificacion' }}
+      </button>
     </div>
 
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Calificaciones</h5>
+    <div class="row g-4">
+      <div class="col-12" *ngIf="mostrarFormulario">
+        <div class="card module-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="card-title h5 mb-0">Registrar calificacion</h2>
+            <button class="btn btn-sm btn-outline-secondary" type="button" (click)="toggleFormulario()">Cerrar</button>
+          </div>
+          <div class="card-body">
+            <form class="row g-3" [formGroup]="califForm" (ngSubmit)="crearCalificacion()">
+              <div class="col-md-6">
+                <label class="form-label">Contrato</label>
+                <select class="form-select" formControlName="contrato_id">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let c of contratos" [value]="c.id">
+                    {{ c.cliente?.nombre ? (c.cliente.nombre + ' ' + (c.cliente.apellido || '')) : (c.cliente_id || 'Contrato ' + c.id) }} -
+                    {{ c.unidad?.numero_unidad ? c.unidad.numero_unidad : (c.unidad_id || '') }}
+                  </option>
+                </select>
+                <small class="text-danger" *ngIf="califForm.get('contrato_id')?.hasError('required') && califForm.get('contrato_id')?.touched">
+                  El contrato es requerido
+                </small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Puntaje</label>
+                <div class="rating-input" (mouseleave)="clearHover()">
+                  <button
+                    type="button"
+                    class="star-btn"
+                    *ngFor="let n of estrellas"
+                    (mouseenter)="setHovered(n)"
+                    (click)="seleccionarPuntaje(n)"
+                    [class.active]="(hoveredStar || califForm.value.puntaje) >= n"
+                    [attr.aria-pressed]="califForm.value.puntaje === n"
+                    [attr.aria-label]="'Seleccionar ' + n + ' estrellas'">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 2.25l2.82 5.72 6.31.92-4.56 4.44 1.08 6.28L12 16.98l-5.65 2.97 1.08-6.28-4.56-4.44 6.31-.92L12 2.25z"/>
+                    </svg>
+                  </button>
+                  <span class="current-score text-muted small">{{ califForm.value.puntaje }}/5</span>
+                </div>
+                <small class="text-danger" *ngIf="califForm.get('puntaje')?.hasError('required') && califForm.get('puntaje')?.touched">
+                  El puntaje es requerido
+                </small>
+                <small class="text-danger" *ngIf="(califForm.get('puntaje')?.hasError('min') || califForm.get('puntaje')?.hasError('max')) && califForm.get('puntaje')?.touched">
+                  Debe estar entre 1 y 5 estrellas
+                </small>
+              </div>
+              <input type="hidden" formControlName="cliente_id" />
+              <input type="hidden" formControlName="unidad_id" />
+              <input type="hidden" formControlName="proyecto_id" />
+              <div class="col-12">
+                <label class="form-label">Comentario (opcional)</label>
+                <textarea formControlName="comentario" rows="3" class="form-control"></textarea>
+              </div>
+              <div class="col-12" *ngIf="error">
+                <div class="alert alert-danger">{{ error }}</div>
+              </div>
+              <div class="col-12" *ngIf="success">
+                <div class="alert alert-success">{{ success }}</div>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-primary" type="submit" [disabled]="saving">Registrar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
 
-            <table class="table table-hover table-bordered">
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Contrato</th>
-                        <th>Puntaje</th>
-                        <th>Comentario</th>
-                        <th>Acciones</th>
-                    </tr>
+      <div class="col-12">
+        <div class="card module-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="card-title h5 mb-0">Opiniones recientes</h2>
+            <span class="badge text-bg-primary-subtle text-primary">{{ calificaciones.length || 0 }} registros</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="text-center py-4" *ngIf="loadingTabla">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+            <ng-container *ngIf="!loadingTabla">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Contrato</th>
+                    <th>Puntaje</th>
+                    <th>Comentario</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let cal of calificaciones; let i = index">
-                        <td>{{ i + 1 }}</td>
-                        <td>
-                            {{ cal.contrato?.cliente?.nombre ? (cal.contrato.cliente.nombre + ' ' +
-                            (cal.contrato.cliente.apellido || '')) : (cal.contrato_id || 'Contrato ' +
-                            (cal.contrato?.id || '')) }}
-                        </td>
-                        <td>{{ cal.puntaje }}</td>
-                        <td>{{ cal.comentario || '—' }}</td>
-                        <td>
-                            <button class="btn btn-danger btn-sm"
-                                (click)="eliminarCalificacion(cal.id)">Eliminar</button>
-                        </td>
-                    </tr>
-
-                    <tr *ngIf="calificaciones.length === 0">
-                        <td colspan="5" class="text-center text-muted">No hay calificaciones registradas</td>
-                    </tr>
+                  <tr *ngFor="let cal of calificaciones; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>
+                      {{ cal.contrato?.cliente?.nombre ? (cal.contrato.cliente.nombre + ' ' + (cal.contrato.cliente.apellido || '')) : (cal.contrato_id || 'Contrato ' + (cal.contrato?.id || '')) }}
+                    </td>
+                    <td>
+                      <div class="rating-display d-inline-flex align-items-center">
+                        <ng-container *ngFor="let n of estrellas">
+                          <svg class="star" viewBox="0 0 24 24" aria-hidden="true" [class.filled]="n <= (+cal.puntaje || 0)">
+                            <path d="M12 2.25l2.82 5.72 6.31.92-4.56 4.44 1.08 6.28L12 16.98l-5.65 2.97 1.08-6.28-4.56-4.44 6.31-.92L12 2.25z"/>
+                          </svg>
+                        </ng-container>
+                        <span class="small text-muted ms-2">{{ cal.puntaje }}/5</span>
+                      </div>
+                    </td>
+                    <td>{{ cal.comentario || 'Sin comentarios' }}</td>
+                    <td class="text-end">
+                      <button class="btn btn-outline-danger btn-sm" (click)="eliminarCalificacion(cal.id)">Eliminar</button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="calificaciones.length === 0">
+                    <td colspan="5" class="text-center text-muted py-4">No hay calificaciones registradas</td>
+                  </tr>
                 </tbody>
-            </table>
+              </table>
+            </div>
+            </ng-container>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+</section>
+
+<div class="blocking-overlay" *ngIf="saving">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Guardando...</span>
+      </div>
+      <h2 class="h6 mb-0">Guardando calificación</h2>
+    </div>
+    <p class="mb-1">Estamos registrando la calificación.</p>
+    <p class="text-muted small mb-0">Por favor espera mientras completamos la operación.</p>
+  </div>
+</div>
+
+<div class="blocking-overlay" *ngIf="deleting">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Borrando...</span>
+      </div>
+      <h2 class="h6 mb-0">Borrando calificación</h2>
+    </div>
+    <p class="mb-1">Estamos eliminando el registro seleccionado. Por favor espera...</p>
+    <p class="text-muted small mb-0">Esta ventana se cerrará al completar la operación.</p>
+  </div>
+</div>
+
+<div class="blocking-overlay" *ngIf="errorModalMessage">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <span class="text-danger fw-bold">!</span>
+      <h2 class="h6 mb-0 text-danger">No se pudo completar la operación</h2>
+    </div>
+    <p class="mb-2">{{ errorModalMessage }}</p>
+    <p class="text-muted small mb-3">El backend devolvió un error. Intenta nuevamente más tarde.</p>
+    <button type="button" class="btn btn-primary" (click)="cerrarErrorModal()">Entendido</button>
+  </div>
 </div>

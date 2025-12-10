@@ -1,29 +1,39 @@
-<section class="app-page">
-  <div class="app-card narrow">
-    <div class="app-card-header">
-      <div>
-        <h1 class="app-card-title">Mi Perfil</h1>
-        <p class="app-card-subtitle">Consulta la informacion asociada a tu cuenta.</p>
+<section class="page-shell module-wrapper">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="card module-card p-4">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="avatar-circle">{{ (userName || userEmail || 'U').charAt(0) | uppercase }}</div>
+            <div>
+              <p class="text-uppercase text-muted small mb-1">Perfil</p>
+              <h1 class="h4 mb-0">Mi cuenta</h1>
+            </div>
+          </div>
+
+          <div *ngIf="loading" class="text-muted">Cargando perfil...</div>
+
+          <div *ngIf="!loading && hasProfile" class="list-group list-group-flush mb-4">
+            <div class="list-group-item px-0 d-flex justify-content-between">
+              <span class="text-muted">Nombre</span>
+              <span class="fw-semibold">{{ userName || 'Sin nombre' }}</span>
+            </div>
+            <div class="list-group-item px-0 d-flex justify-content-between">
+              <span class="text-muted">Correo</span>
+              <span class="fw-semibold">{{ userEmail || 'Sin correo' }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="!loading && !hasProfile" class="alert alert-warning">
+            No pudimos cargar tu perfil. Intenta iniciar sesion nuevamente.
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-danger" (click)="logout()">Cerrar sesion</button>
+            <a routerLink="/" class="btn btn-outline-primary">Volver al inicio</a>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div *ngIf="loading" class="status muted">Cargando perfil...</div>
-
-    <div *ngIf="!loading && hasProfile" class="detail-list">
-      <div class="detail-row">
-        <span class="detail-label">Nombre</span>
-        <span class="detail-value">{{ userName || 'Sin nombre' }}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Correo</span>
-        <span class="detail-value">{{ userEmail || 'Sin correo' }}</span>
-      </div>
-    </div>
-
-    <div *ngIf="!loading && !hasProfile" class="status error">
-      No pudimos cargar tu perfil. Intenta iniciar sesion nuevamente.
-    </div>
-
-    <a routerLink="/" class="back-link">Volver al inicio</a>
   </div>
 </section>

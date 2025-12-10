@@ -1,40 +1,79 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-            <a class="navbar-brand me-3" href="#">Inmobiliaria</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm">
+  <div class="container-fluid gap-3">
+    <a class="navbar-brand fw-semibold text-primary" routerLink="/" (click)="closeMenu()">
+      Inmobiliaria
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="isMenuOpen"
+      aria-controls="navbarNav"
+      aria-label="Abrir navegacion"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div
+      class="collapse navbar-collapse justify-content-between"
+      [class.show]="isMenuOpen"
+      id="navbarNav"
+    >
+      <ul class="navbar-nav align-items-lg-center gap-lg-1 mb-3 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" (click)="closeMenu()">Inicio</a>
+        </li>
+        <ng-container *ngIf="isAuthenticated; else publicLinks">
+          <li class="nav-item" *ngFor="let link of protectedLinks">
+            <a
+              class="nav-link"
+              [routerLink]="link.route"
+              routerLinkActive="active"
+              (click)="closeMenu()"
+              >{{ link.label }}</a
+            >
+          </li>
+        </ng-container>
+      </ul>
+
+      <div
+        class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 w-100 w-lg-auto auth-actions"
+      >
+        <div
+          *ngIf="isAuthenticated && (userName || userEmail)"
+          class="d-flex align-items-center gap-2 flex-grow-1 flex-lg-grow-0"
+        >
+          <button type="button" class="btn btn-outline-primary nav-profile" (click)="goToProfile()">
+            <span class="avatar">{{ avatarInitial }}</span>
+            <span class="text">
+              <span class="d-block fw-semibold">{{ userName || 'Usuario' }}</span>
+              <small class="text-muted">{{ userEmail }}</small>
+            </span>
+          </button>
         </div>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
-                <li class="nav-item active">
-                    <a class="nav-link" routerLink="/">Inicio</a>
-                </li>
-                <li class="nav-item" *ngIf="!isAuthenticated">
-                    <a class="nav-link" (click)="openLoginModal()">Login</a>
-                </li>
-                <li class="nav-item" *ngIf="!isAuthenticated">
-                    <a class="nav-link" (click)="openRegisterModal()">Registrarse</a>
-                </li>
-                <li class="nav-item" *ngIf="isAuthenticated">
-                    <a class="nav-link" routerLink="/clientes">Clientes</a>
-                </li>
-                <li class="nav-item" *ngIf="isAuthenticated">
-                    <a class="nav-link" routerLink="/proyectos">Proyectos</a>
-                </li>
-                <li class="nav-item" *ngIf="isAuthenticated">
-                    <a class="nav-link" routerLink="/unidades">Unidades</a>
-                </li>
-                <li class="nav-item" *ngIf="isAuthenticated">
-                    <a class="nav-link" (click)="logout()">Cerrar Sesión</a>
-                </li>
-            </ul>
-            <div class="ms-lg-3 text-lg-end user-info" *ngIf="isAuthenticated && (userName || userEmail)">
-                <span class="d-block fw-semibold">{{ userName || 'Usuario' }}</span>
-                <small class="text-muted">{{ userEmail }}</small>
-            </div>
+
+        <div *ngIf="!isAuthenticated" class="d-flex flex-column flex-lg-row gap-2 w-100 w-lg-auto">
+          <button type="button" class="btn btn-outline-primary" (click)="openLoginModal()">
+            Iniciar sesion
+          </button>
+          <button type="button" class="btn btn-primary" (click)="openRegisterModal()">
+            Registrarse
+          </button>
         </div>
+      </div>
     </div>
+  </div>
 </nav>
+
+<ng-template #publicLinks>
+  <li class="nav-item">
+    <a
+      routerLink="/buscar-contrato"
+      routerLinkActive="active"
+      class="nav-link"
+      (click)="closeMenu()"
+    >
+      Portal de Pago
+    </a>
+  </li>
+</ng-template>

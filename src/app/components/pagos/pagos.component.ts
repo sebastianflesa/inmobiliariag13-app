@@ -20,6 +20,10 @@ export class PagosComponent implements OnInit, OnDestroy {
   loading = false;
   saving = false;
   error: string | null = null;
+  mostrarFormulario = false;
+  loadingTabla = false;
+  deleting = false;
+  errorModalMessage: string | null = null;
 
   private subs: Subscription[] = [];
 
@@ -30,7 +34,7 @@ export class PagosComponent implements OnInit, OnDestroy {
   ) {
     this.pagoForm = this.fb.group({
       contrato_id: ['', Validators.required],
-      monto: ['', [Validators.required, Validators.min(0)]],
+      monto: ['', [Validators.required, Validators.min(1)]],
       fecha_pago: ['', Validators.required],
       metodo_pago: ['transferencia', Validators.required],
       estado: ['pendiente', Validators.required]
@@ -40,6 +44,13 @@ export class PagosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadLookups();
     this.loadPagos();
+  }
+
+  toggleFormulario(): void {
+    this.mostrarFormulario = !this.mostrarFormulario;
+    if (!this.mostrarFormulario) {
+      this.pagoForm.reset({ metodo_pago: 'transferencia', estado: 'pendiente' });
+    }
   }
 
   loadLookups() {
@@ -60,15 +71,18 @@ export class PagosComponent implements OnInit, OnDestroy {
 
   loadPagos() {
     this.loading = true;
+    this.loadingTabla = true;
     const s = this.pagoService.getPagos().subscribe({
       next: (res: any) => {
         this.pagos = Array.isArray(res) ? res : (res.data || []);
         this.loading = false;
+        this.loadingTabla = false;
       },
       error: err => {
         console.error(err);
         this.error = 'Error cargando pagos';
         this.loading = false;
+        this.loadingTabla = false;
       }
     });
     this.subs.push(s);
@@ -85,11 +99,13 @@ export class PagosComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.saving = false;
         this.pagoForm.reset({ metodo_pago: 'transferencia', estado: 'pendiente' });
+        this.mostrarFormulario = false;
         this.loadPagos();
       },
       error: err => {
         console.error(err);
         this.error = err?.error?.message || 'Error creando pago';
+        this.errorModalMessage = 'No se pudo crear el pago. Intenta nuevamente.';
         this.saving = false;
       }
     });
@@ -98,14 +114,24 @@ export class PagosComponent implements OnInit, OnDestroy {
 
   eliminarPago(id: number) {
     if (!confirm('¿Eliminar pago?')) return;
+    this.deleting = true;
     const s = this.pagoService.deletePago(id).subscribe({
-      next: () => this.loadPagos(),
+      next: () => {
+        this.deleting = false;
+        this.loadPagos();
+      },
       error: err => {
         console.error(err);
         this.error = 'Error eliminando pago';
+        this.errorModalMessage = 'No se pudo eliminar el pago. Intenta nuevamente.';
+        this.deleting = false;
       }
     });
     this.subs.push(s);
+  }
+
+  cerrarErrorModal(): void {
+    this.errorModalMessage = null;
   }
 
   ngOnDestroy(): void {

@@ -11,10 +11,12 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './create-user.component.css'
 })
 export class CreateUserComponent {
+  loading = false;
 
   constructor(private authService: AuthService) { }
 
   startSignUp(): void {
+    this.loading = true;
     this.authService.registerWithCognito();
   }
 }

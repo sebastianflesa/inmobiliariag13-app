@@ -1,21 +1,26 @@
-.container {
-    margin-top: 20px;
+:host ::ng-deep form small {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
 }
 
-.text-center {
-    text-align: center;
+.empty-state {
+  text-align: center;
 }
 
-.table {
-    margin-top: 20px;
+.blocking-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 1050;
 }
 
-.btn {
-    margin: 5px;
-}
-
-.text-danger {
-    color: #dc3545;
-    font-size: 0.8rem;
-    margin-top: 0.2rem;
+.overlay-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: min(420px, 90vw);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
 }

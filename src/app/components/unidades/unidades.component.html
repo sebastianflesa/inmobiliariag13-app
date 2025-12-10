@@ -1,111 +1,206 @@
-<div class="container">
-    <h1 class="text-center">Unidades</h1>
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-                {{ errorMessage }}
-            </div>
-            <ng-container *ngIf="!isLoadingUnidades; else unidadesLoading">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Número de unidad</th>
-                            <th>Tipo de unidad</th>
-                            <th>Metraje</th>
-                            <th>Precio de venta</th>
-                            <th>Estado</th>
-                            <th>Proyecto</th>
-                            <th>Cliente</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let unidad of unidades">
-                            <td>{{ unidad.numero_unidad }}</td>
-                            <td>{{ unidad.tipo_unidad }}</td>
-                            <td>{{ unidad.metraje }}</td>
-                            <td>{{ unidad.precio_venta }}</td>
-                            <td>{{ unidad.estado }}</td>
-                            <td>{{ getProyectoNombre(unidad.proyecto_id) }}</td>
-                            <td>{{ getClienteRut(unidad.cliente_id) }}</td>
-                            <td>
-                                <button class="btn btn-primary" (click)="editarUnidad(unidad)">Editar</button>
-                                <button class="btn btn-danger" (click)="eliminarUnidad(unidad)">Eliminar</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </ng-container>
-            <ng-template #unidadesLoading>
-                <div class="text-center my-4">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Cargando...</span>
-                    </div>
-                    <p class="mt-2 mb-0">Cargando unidades...</p>
-                </div>
-            </ng-template>
-            <button class="btn btn-success"
-                (click)="mostrarFormulario = true; modoEdicion = false; unidadForm.reset()">Crear Unidad</button>
-            <div *ngIf="mostrarFormulario">
-                <form [formGroup]="unidadForm">
-                    <div class="form-group">
-                        <label>Número de unidad:</label>
-                        <input formControlName="numero_unidad" type="text" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo de Unidad:</label>
-                        <select formControlName="tipo_unidad" class="form-control">
-                            <option value="Departamento">Departamento</option>
-                            <option value="Casa">Casa</option>
-                            <option value="Parcela">Parcela</option>
-                            <option value="Terreno">Terreno</option>
-                            <option value="Oficina">Oficina</option>
-                            <option value="Local comercial">Local comercial</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Metraje:</label>
-                        <input formControlName="metraje" type="number" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Precio de venta:</label>
-                        <input formControlName="precio_venta" type="number" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Estado:</label>
-                        <select formControlName="estado" class="form-control">
-                            <option value="Disponible">Disponible</option>
-                            <option value="Reservado">Reservado</option>
-                            <option value="Vendido">Vendido</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Proyecto:</label>
-                        <select formControlName="proyecto_id" class="form-control" [disabled]="isLoadingProyectos">
-                            <option *ngIf="isLoadingProyectos" disabled>Cargando proyectos...</option>
-                            <option *ngFor="let proyecto of proyectos" [value]="proyecto.id">{{ proyecto.nombre }}</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Cliente:</label>
-                        <select formControlName="cliente_id" class="form-control" [disabled]="isLoadingClientes">
-                            <option value="">Sin cliente</option>
-                            <option *ngIf="isLoadingClientes" disabled>Cargando clientes...</option>
-                            <option *ngFor="let cliente of clientes" [value]="cliente.id">
-                                {{ cliente.rut }} - {{ cliente.nombre }} {{ cliente.apellido }}
-                            </option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary" (click)="crearUnidad()">Guardar</button>
-                    <button class="btn btn-secondary" (click)="mostrarFormulario = false">Cancelar</button>
-                </form>
-            </div>
-            <div *ngIf="unidadCreada">
-                <p>Unidad creada con éxito</p>
-            </div>
-            <div *ngIf="unidadEditada">
-                <p>Unidad editada con éxito</p>
-            </div>
-        </div>
+<section class="page-shell module-wrapper">
+  <div class="container">
+    <div class="module-header">
+      <div>
+        <p class="text-uppercase text-muted small mb-1">Inventario</p>
+        <h1 class="h3 mb-0">Unidades</h1>
+        <p class="lead fs-6">Consulta disponibilidad y edita los detalles de cada unidad inmobiliaria.</p>
+      </div>
+      <button class="btn btn-primary" (click)="mostrarFormulario = true; modoEdicion = false; unidadForm.reset()">
+        Nueva unidad
+      </button>
     </div>
+
+    <div class="row g-4">
+      <div class="col-12" *ngIf="mostrarFormulario">
+        <div class="card module-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="card-title h5 mb-0">{{ modoEdicion ? 'Actualizar unidad' : 'Crear unidad' }}</h2>
+            <button class="btn btn-sm btn-outline-secondary" (click)="mostrarFormulario = false">Cerrar</button>
+          </div>
+          <div class="card-body">
+            <form class="row g-3" [formGroup]="unidadForm">
+              <div class="col-md-4">
+                <label class="form-label">Numero de unidad</label>
+                <input formControlName="numero_unidad" type="text" class="form-control" />
+                <small class="text-danger" *ngIf="unidadForm.get('numero_unidad')?.hasError('required') && unidadForm.get('numero_unidad')?.touched">
+                  El número de unidad es requerido
+                </small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Tipo</label>
+                <select formControlName="tipo_unidad" class="form-select">
+                  <option value="">Seleccione tipo</option>
+                  <option value="Departamento">Departamento</option>
+                  <option value="Casa">Casa</option>
+                  <option value="Parcela">Parcela</option>
+                  <option value="Terreno">Terreno</option>
+                  <option value="Oficina">Oficina</option>
+                  <option value="Local comercial">Local comercial</option>
+                </select>
+                <small class="text-danger" *ngIf="unidadForm.get('tipo_unidad')?.hasError('required') && unidadForm.get('tipo_unidad')?.touched">
+                  El tipo de unidad es requerido
+                </small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Metraje (m)</label>
+                <input formControlName="metraje" type="number" class="form-control" min="1" />
+                <small class="text-danger" *ngIf="unidadForm.get('metraje')?.hasError('required') && unidadForm.get('metraje')?.touched">
+                  El metraje es requerido
+                </small>
+                <small class="text-danger" *ngIf="(unidadForm.get('metraje')?.hasError('min') || unidadForm.get('metraje')?.hasError('pattern')) && unidadForm.get('metraje')?.touched">
+                  Debe ser un número mayor a 0
+                </small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Precio de venta</label>
+                <input formControlName="precio_venta" type="number" class="form-control" min="1000000" />
+                <small class="text-danger" *ngIf="unidadForm.get('precio_venta')?.hasError('required') && unidadForm.get('precio_venta')?.touched">
+                  El precio de venta es requerido
+                </small>
+                <small class="text-danger" *ngIf="(unidadForm.get('precio_venta')?.hasError('min') || unidadForm.get('precio_venta')?.hasError('pattern')) && unidadForm.get('precio_venta')?.touched">
+                  Debe ser un número mayor a 0
+                </small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Estado</label>
+                <select formControlName="estado" class="form-select">
+                  <option value="">Seleccione estado</option>
+                  <option value="Disponible">Disponible</option>
+                  <option value="Reservado">Reservado</option>
+                  <option value="Vendido">Vendido</option>
+                </select>
+                <small class="text-danger" *ngIf="unidadForm.get('estado')?.hasError('required') && unidadForm.get('estado')?.touched">
+                  El estado es requerido
+                </small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Proyecto</label>
+                <select formControlName="proyecto_id" class="form-select">
+                  <option value="">Seleccione proyecto</option>
+                  <option *ngFor="let proyecto of proyectos" [value]="proyecto.id">{{ proyecto.nombre }}</option>
+                </select>
+                <small class="text-danger" *ngIf="unidadForm.get('proyecto_id')?.hasError('required') && unidadForm.get('proyecto_id')?.touched">
+                  El proyecto es requerido
+                </small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Cliente</label>
+                <select formControlName="cliente_id" class="form-select">
+                  <option value="">Sin cliente</option>
+                  <option *ngFor="let cliente of clientes" [value]="cliente.id">
+                    {{ cliente.rut }} - {{ cliente.nombre }} {{ cliente.apellido }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-12 d-flex gap-2">
+                <button type="button" class="btn btn-primary" (click)="crearUnidad()">Guardar</button>
+                <button type="button" class="btn btn-outline-secondary" (click)="mostrarFormulario = false">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="card module-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="card-title h5 mb-0">Inventario disponible</h2>
+            <span class="badge text-bg-primary-subtle text-primary">{{ unidades.length || 0 }} unidades</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="text-center py-4" *ngIf="loading">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+            <ng-container *ngIf="!loading">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Numero</th>
+                    <th>Tipo</th>
+                    <th>Metraje</th>
+                    <th>Precio venta</th>
+                    <th>Estado</th>
+                    <th>Proyecto</th>
+                    <th>Cliente</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let unidad of unidades">
+                    <td class="fw-semibold">{{ unidad.numero_unidad }}</td>
+                    <td>{{ unidad.tipo_unidad }}</td>
+                    <td>{{ unidad.metraje | number: '1.0-0' }} m</td>
+                    <td>${{ unidad.precio_venta | number: '1.0-0' }}</td>
+                    <td>
+                      <span class="status-badge bg-light text-primary">{{ unidad.estado }}</span>
+                    </td>
+                    <td>{{ getProyectoNombre(unidad.proyecto_id) }}</td>
+                    <td>{{ getClienteRut(unidad.cliente_id) || 'Sin asignar' }}</td>
+                    <td class="text-end">
+                      <div class="btn-group">
+                        <button class="btn btn-outline-primary btn-sm" (click)="editarUnidad(unidad)">Editar</button>
+                        <button class="btn btn-outline-danger btn-sm" (click)="eliminarUnidad(unidad)">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!unidades?.length">
+                    <td colspan="8" class="text-center py-4 text-muted">Sin unidades registradas.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" *ngIf="unidadCreada || unidadEditada">
+        <div class="alert alert-success">
+          {{ unidadCreada ? 'Unidad creada con exito' : 'Unidad editada con exito' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="blocking-overlay" *ngIf="saving">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Guardando...</span>
+      </div>
+      <h2 class="h6 mb-0">Guardando unidad</h2>
+    </div>
+    <p class="mb-1">Estamos procesando la información de la unidad.</p>
+    <p class="text-muted small mb-0">Por favor espera mientras completamos la operación.</p>
+  </div>
+</div>
+
+<div class="blocking-overlay" *ngIf="deleting">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Borrando...</span>
+      </div>
+      <h2 class="h6 mb-0">Borrando unidad</h2>
+    </div>
+    <p class="mb-1">Estamos eliminando el registro seleccionado. Por favor espera...</p>
+    <p class="text-muted small mb-0">Esta ventana se cerrará al completar la operación.</p>
+  </div>
+</div>
+
+<div class="blocking-overlay" *ngIf="errorModalMessage">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <span class="text-danger fw-bold">!</span>
+      <h2 class="h6 mb-0 text-danger">No se pudo completar la operación</h2>
+    </div>
+    <p class="mb-2">{{ errorModalMessage }}</p>
+    <p class="text-muted small mb-3">El backend devolvió un error. Intenta nuevamente más tarde.</p>
+    <button type="button" class="btn btn-primary" (click)="cerrarErrorModal()">Entendido</button>
+  </div>
 </div>

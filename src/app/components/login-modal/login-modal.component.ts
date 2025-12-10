@@ -1,16 +1,14 @@
-import { CommonModule } from '@angular/common';
-import { Component, Injector, Inject, OnInit, signal } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, Injector, Inject, OnInit, Optional, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 @Component({
   selector: 'app-login-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule],
   templateUrl: './login-modal.component.html',
   styleUrls: ['./login-modal.component.css']
 })
@@ -19,7 +17,7 @@ export class LoginComponent implements OnInit {
   userDataJson = signal<string>('{}');
 
   constructor(
-    private activeModal: NgbActiveModal,
+    @Optional() private activeModal: NgbActiveModal,
     private router: Router,
     private injector: Injector,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -34,7 +32,7 @@ export class LoginComponent implements OnInit {
       this.isAuthenticated = isAuthenticated;
       if (isAuthenticated) {
         oidc.userData$.subscribe(data => this.userDataJson.set(JSON.stringify(data, null, 2)));
-        this.activeModal.close();
+        this.activeModal?.close();
         this.router.navigate(['/']);
       }
     });
@@ -53,6 +51,6 @@ export class LoginComponent implements OnInit {
   }
 
   closeModal(): void {
-    this.activeModal.close();
+    this.activeModal?.close();
   }
 }

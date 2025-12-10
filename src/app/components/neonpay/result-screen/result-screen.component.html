@@ -1,7 +1,37 @@
-<div class="result-container">
+<div class="result-container" [class.approved]="result === 'approved'" [class.rejected]="result === 'rejected'">
+
+    <!-- Línea de escaneo -->
+    <div class="scan-line"></div>
+
+    <!-- Icono grande -->
+    <div class="result-icon" [class.success]="result === 'approved'" [class.error]="result === 'rejected'">
+        {{ result === 'approved' ? '✓' : '✗' }}
+    </div>
+
+    <!-- Título principal -->
     <h2 [class.success]="result === 'approved'" [class.error]="result === 'rejected'">
-        {{ result === 'approved' ? 'Pago Aprobado!' : 'Pago Rechazado' }}
+        {{ result === 'approved' ? '¡Pago Aprobado!' : 'Pago Rechazado' }}
     </h2>
 
-    <button (click)="restart()">Volver al Inicio</button>
+    <!-- Mensaje secundario -->
+    <p class="result-message">
+        {{ result === 'approved'
+        ? 'Tu transacción se ha procesado correctamente'
+        : 'La transacción no pudo ser procesada' }}
+    </p>
+
+    <!-- Detalles del pago (opcional) -->
+    <div class="payment-details" *ngIf="paymentInfo">
+        <p><strong>Monto:</strong> {{ paymentInfo.amount | currency:'CLP':'symbol-narrow' }}</p>
+        <p><strong>Fecha:</strong> {{ paymentInfo.date | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p *ngIf="paymentInfo.contract"><strong>Contrato:</strong> #{{ paymentInfo.contract }}</p>
+        <p *ngIf="result === 'rejected' && errorMessage">
+            <strong>Motivo:</strong> {{ errorMessage }}
+        </p>
+    </div>
+
+    <!-- Botón de reinicio -->
+    <button (click)="restart()">
+        {{ result === 'approved' ? '← Volver al Inicio' : '🔄 Intentar Nuevamente' }}
+    </button>
 </div>

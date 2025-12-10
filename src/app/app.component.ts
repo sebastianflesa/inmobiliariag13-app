@@ -1,8 +1,8 @@
-import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ProyectosComponent } from './components/proyectos/proyectos.component';
-import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 
 @Component({
@@ -35,7 +35,6 @@ export class AppComponent implements OnInit {
     });
 
     if (isPlatformBrowser(this.platformId)) {
-      // Ensure we sync auth state after refresh/navigation
       this.authService.ensureAuthenticated().subscribe();
     }
   }

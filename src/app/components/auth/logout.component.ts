@@ -5,7 +5,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-logout',
   standalone: true,
-  template: '<p>Logging out...</p>',
+  template: '<p>Cerrando sesion...</p>',
 })
 export class LogoutComponent implements OnInit {
 

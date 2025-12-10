@@ -1,34 +1,48 @@
-<section class="app-page">
-  <div class="app-card narrow">
-    <div class="app-card-header">
-      <div>
-        <h1 class="app-card-title">Crear usuario</h1>
-        <p class="app-card-subtitle">
-          Registra una nueva cuenta utilizando el flujo oficial del Web App Cognito. Solo necesitas seguir los pasos y confirmar tu correo.
-        </p>
-      </div>
-    </div>
+<section class="page-shell module-wrapper">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="card module-card p-4">
+          <p class="text-uppercase text-muted small mb-2">Usuarios</p>
+          <h1 class="h4">Crear usuario</h1>
+          <p class="text-muted mb-4">
+            Registra una nueva cuenta utilizando el flujo oficial del Web App Cognito. Solo necesitas seguir los
+            pasos y confirmar tu correo.
+          </p>
 
-    <div class="detail-list">
-      <div class="detail-row">
-        <span class="detail-label">1</span>
-        <span class="detail-value">Haz clic en "Ir a registro" para abrir el Web App seguro de Cognito.</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">2</span>
-        <span class="detail-value">Completa tus datos personales y elige una contrasena.</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">3</span>
-        <span class="detail-value">Confirma el codigo enviado a tu correo electronico.</span>
-      </div>
-    </div>
+          <ul class="list-group list-group-numbered mb-4">
+            <li class="list-group-item">
+              Haz clic en "Ir a registro" para abrir el Web App seguro de Cognito.
+            </li>
+            <li class="list-group-item">
+              Completa tus datos personales y elige una contrasena.
+            </li>
+            <li class="list-group-item">
+              Confirma el codigo enviado a tu correo electronico.
+            </li>
+          </ul>
 
-    <div class="app-actions">
-      <button type="button" class="primary-action" (click)="startSignUp()">
-        Ir a registro
-      </button>
-      <a routerLink="/" class="secondary-action app-link">Volver al inicio</a>
+          <div class="d-flex flex-column gap-2">
+            <button type="button" class="btn btn-primary" (click)="startSignUp()" [disabled]="loading">
+              {{ loading ? 'Abriendo registro...' : 'Ir a registro' }}
+            </button>
+            <a routerLink="/" class="btn btn-outline-primary">Volver al inicio</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<div class="blocking-overlay" *ngIf="loading">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <h2 class="h6 mb-0">Redirigiendo a registro</h2>
+    </div>
+    <p class="mb-1">Estamos preparando el flujo de creación de usuario.</p>
+    <p class="text-muted small mb-0">No cierres la ventana mientras completamos el redireccionamiento.</p>
+  </div>
+</div>

@@ -1,22 +1,38 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-
+import { PLATFORM_ID } from '@angular/core';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { of, Subject } from 'rxjs';
 import { AuthService } from './auth.service';
+
+class OidcSecurityServiceMock {
+  isAuthenticated$ = new Subject<{ isAuthenticated: boolean }>();
+  userData$ = new Subject<any>();
+
+  checkAuth = jasmine.createSpy('checkAuth').and.returnValue(of({ isAuthenticated: false, accessToken: null, userData: null }));
+  getAccessToken = jasmine.createSpy('getAccessToken').and.returnValue(of(null));
+  authorize = jasmine.createSpy('authorize');
+  logoff = jasmine.createSpy('logoff');
+}
 
 describe('AuthService', () => {
   let service: AuthService;
-  let httpMock: HttpTestingController;
+  let oidcMock: OidcSecurityServiceMock;
 
   beforeEach(() => {
+    oidcMock = new OidcSecurityServiceMock();
+
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      providers: [
+        { provide: OidcSecurityService, useValue: oidcMock },
+        { provide: PLATFORM_ID, useValue: 'browser' }
+      ]
     });
+
     service = TestBed.inject(AuthService);
-    httpMock = TestBed.inject(HttpTestingController);
+    localStorage.clear();
   });
 
   afterEach(() => {
-    httpMock.verify();
     localStorage.clear();
   });
 
@@ -24,47 +40,30 @@ describe('AuthService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('debería realizar login', () => {
-    const credentials = { email: 'user@example.com', password: 'password' };
-    const token = 'token-de-prueba';
-    service.login(credentials.email, credentials.password).subscribe(response => {
-      expect(response).toEqual({ token });
+  it('should set token and mark session as authenticated', (done) => {
+    service.setToken('token-de-prueba');
+    expect(service.isLoggedIn()).toBeTrue();
+    service.getToken().subscribe(token => {
+      expect(token).toBe('token-de-prueba');
+      done();
     });
-    const req = httpMock.expectOne('http://localhost:8000/api/login');
-    expect(req.request.method).toBe('POST');
-    req.flush({ token });
   });
 
-  it('debería realizar logout', () => {
-    service.setToken('token-de-prueba');
+  it('should call authorize when loginWithCognito is executed', () => {
+    service.loginWithCognito();
+    expect(oidcMock.authorize).toHaveBeenCalled();
+  });
+
+  it('should call logoff when logout is executed', () => {
     service.logout();
-    expect(service.getToken()).toBeNull();
+    expect(oidcMock.logoff).toHaveBeenCalled();
+    expect(service.isLoggedIn()).toBeFalse();
   });
 
-  it('debería obtener token', () => {
-    service.setToken('token-de-prueba');
-    expect(service.getToken()).toBe('token-de-prueba');
-  });
-
-  it('debería establecer token', () => {
-    service.setToken('token-de-prueba');
-    expect(service.getToken()).toBe('token-de-prueba');
-  });
-
-  it('debería verificar si está logueado', () => {
-    service.setToken('token-de-prueba');
-    expect(service.isLoggedIn()).toBeTruthy();
-    service.logout();
-    expect(service.isLoggedIn()).toBeFalsy();
-  });
-
-  it('debería realizar registro', () => {
-    const user = { nombre: 'Juan', apellido: 'Pérez', email: 'juan@example.com', password: 'password' };
-    service.register(user).subscribe((response: typeof user) => {
-      expect(response).toEqual(user);
+  it('should trigger checkAuth when ensureAuthenticated is invoked', (done) => {
+    service.ensureAuthenticated().subscribe(() => {
+      expect(oidcMock.checkAuth).toHaveBeenCalled();
+      done();
     });
-    const req = httpMock.expectOne('http://localhost:8000/api/register');
-    expect(req.request.method).toBe('POST');
-    req.flush(user);
   });
 });

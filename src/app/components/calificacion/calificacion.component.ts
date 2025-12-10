@@ -16,11 +16,17 @@ export class CalificacionComponent implements OnInit, OnDestroy {
   calificaciones: any[] = [];
   contratos: any[] = [];
   califForm: FormGroup;
+  estrellas = [1, 2, 3, 4, 5];
+  hoveredStar = 0;
 
   loading = false;
   saving = false;
   error: string | null = null;
   success: string | null = null;
+  mostrarFormulario = false;
+  loadingTabla = false;
+  deleting = false;
+  errorModalMessage: string | null = null;
 
   private subs: Subscription[] = [];
 
@@ -92,15 +98,18 @@ export class CalificacionComponent implements OnInit, OnDestroy {
 
   loadCalificaciones() {
     this.loading = true;
+    this.loadingTabla = true;
     const s = this.calificacionService.getCalificaciones().subscribe({
       next: (res: any) => {
         this.calificaciones = Array.isArray(res) ? res : (res.data || []);
         this.loading = false;
+        this.loadingTabla = false;
       },
       error: err => {
         console.error('Error cargando calificaciones', err);
         this.error = 'Error cargando calificaciones';
         this.loading = false;
+        this.loadingTabla = false;
       }
     });
     this.subs.push(s);
@@ -139,6 +148,7 @@ export class CalificacionComponent implements OnInit, OnDestroy {
         this.success = res?.message || 'Calificación registrada';
         // reset conservando puntaje por defecto
         this.califForm.reset({ puntaje: 5, contrato_id: '', cliente_id: '', unidad_id: '', proyecto_id: '', comentario: '' });
+        this.mostrarFormulario = false;
         this.loadCalificaciones();
       },
       error: err => {
@@ -152,6 +162,7 @@ export class CalificacionComponent implements OnInit, OnDestroy {
         } else {
           this.error = err?.error?.message || 'Error creando calificación';
         }
+        this.errorModalMessage = 'No se pudo registrar la calificación. Intenta nuevamente.';
       }
     });
 
@@ -160,13 +171,17 @@ export class CalificacionComponent implements OnInit, OnDestroy {
 
   eliminarCalificacion(id: number) {
     if (!confirm('¿Eliminar calificación?')) return;
+    this.deleting = true;
     const s = this.calificacionService.deleteCalificacion(id).subscribe({
       next: () => {
+        this.deleting = false;
         this.loadCalificaciones();
       },
       error: err => {
         console.error('Error eliminando calificación', err);
         this.error = 'Error eliminando calificación';
+        this.errorModalMessage = 'No se pudo eliminar la calificación. Intenta nuevamente.';
+        this.deleting = false;
       }
     });
     this.subs.push(s);
@@ -174,5 +189,30 @@ export class CalificacionComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe && s.unsubscribe());
+  }
+
+  toggleFormulario(): void {
+    this.mostrarFormulario = !this.mostrarFormulario;
+    if (!this.mostrarFormulario) {
+      this.califForm.reset({ puntaje: 5, contrato_id: '', cliente_id: '', unidad_id: '', proyecto_id: '', comentario: '' });
+      this.error = null;
+      this.success = null;
+    }
+  }
+
+  cerrarErrorModal(): void {
+    this.errorModalMessage = null;
+  }
+
+  seleccionarPuntaje(valor: number): void {
+    this.califForm.patchValue({ puntaje: valor });
+  }
+
+  setHovered(valor: number): void {
+    this.hoveredStar = valor;
+  }
+
+  clearHover(): void {
+    this.hoveredStar = 0;
   }
 }

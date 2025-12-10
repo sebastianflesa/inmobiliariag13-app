@@ -1,54 +1,78 @@
-import { TestBed } from '@angular/core/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PLATFORM_ID } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { LoginComponent } from '../login-modal/login-modal.component';
-import { RegisterModalComponent } from '../register-modal/register-modal.component';
 import { NavbarComponent } from './navbar.component';
+
+class AuthServiceMock {
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  private userProfileSubject = new BehaviorSubject<{ name?: string; email?: string } | null>(null);
+
+  isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  userProfile$ = this.userProfileSubject.asObservable();
+
+  isLoggedIn = jasmine.createSpy('isLoggedIn').and.returnValue(false);
+  loginWithCognito = jasmine.createSpy('loginWithCognito');
+  registerWithCognito = jasmine.createSpy('registerWithCognito');
+  logout = jasmine.createSpy('logout');
+  handleRedirectCallback = jasmine.createSpy('handleRedirectCallback');
+
+  emitAuthState(state: boolean) {
+    this.isAuthenticatedSubject.next(state);
+  }
+
+  emitProfile(profile: { name?: string; email?: string }) {
+    this.userProfileSubject.next(profile);
+  }
+}
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
-  let authServiceSpy: any;
-  let modalServiceSpy: any;
+  let fixture: ComponentFixture<NavbarComponent>;
+  let authServiceMock: AuthServiceMock;
+  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'logout']);
-    modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
+    authServiceMock = new AuthServiceMock();
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [NavbarComponent],
       providers: [
-        { provide: AuthService, useValue: authServiceSpy },
-        { provide: NgbModal, useValue: modalServiceSpy }
+        { provide: AuthService, useValue: authServiceMock },
+        { provide: Router, useValue: routerSpy },
+        { provide: PLATFORM_ID, useValue: 'browser' }
       ]
-    })
-      .compileComponents();
+    }).compileComponents();
 
-    component = new NavbarComponent(authServiceSpy, modalServiceSpy);
+    fixture = TestBed.createComponent(NavbarComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debería llamar a isLoggedIn del AuthService', () => {
-    component.isLoggedIn();
-    expect(authServiceSpy.isLoggedIn).toHaveBeenCalledTimes(1);
-  });
-
-  it('debería abrir el modal de login', () => {
+  it('should trigger loginWithCognito when openLoginModal is called', () => {
     component.openLoginModal();
-    expect(modalServiceSpy.open).toHaveBeenCalledTimes(1);
-    expect(modalServiceSpy.open).toHaveBeenCalledWith(LoginComponent);
+    expect(authServiceMock.loginWithCognito).toHaveBeenCalledTimes(1);
   });
 
-  it('debería abrir el modal de registro', () => {
+  it('should trigger registerWithCognito when openRegisterModal is called', () => {
     component.openRegisterModal();
-    expect(modalServiceSpy.open).toHaveBeenCalledTimes(1);
-    expect(modalServiceSpy.open).toHaveBeenCalledWith(RegisterModalComponent);
+    expect(authServiceMock.registerWithCognito).toHaveBeenCalledTimes(1);
   });
 
-  it('debería llamar a logout del AuthService', () => {
+  it('should logout and navigate to /logout', () => {
     component.logout();
-    expect(authServiceSpy.logout).toHaveBeenCalledTimes(1);
+    expect(authServiceMock.logout).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/logout']);
+  });
+
+  it('should navigate to profile when goToProfile is called', () => {
+    component.goToProfile();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/mi-perfil']);
   });
 });

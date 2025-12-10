@@ -1,9 +1,39 @@
 <div class="pin-container">
-    <h2>Ingrese su PIN</h2>
+    <h2>🔒 Ingrese su PIN</h2>
 
-    <input type="password" maxlength="4" [(ngModel)]="pin" class="pin-input" />
+    <p class="help-text">Ingrese su código PIN de 4 dígitos</p>
 
-    <button (click)="sendPin()" [disabled]="loading">
-        {{ loading ? 'Validando...' : 'Continuar' }}
+    <!-- Indicadores de dígitos (opcional, más visual) -->
+    <div class="pin-dots">
+        <div class="pin-dot" [class.filled]="pin.length >= 1"></div>
+        <div class="pin-dot" [class.filled]="pin.length >= 2"></div>
+        <div class="pin-dot" [class.filled]="pin.length >= 3"></div>
+        <div class="pin-dot" [class.filled]="pin.length >= 4"></div>
+    </div>
+
+    <!-- Input de PIN -->
+    <input type="password" maxlength="4" [(ngModel)]="pin" class="pin-input" placeholder="••••" [disabled]="loading"
+        autocomplete="off" inputmode="numeric" />
+
+    <!-- Teclado numérico (OPCIONAL - puedes omitirlo si prefieres solo el input) -->
+    <div class="numpad">
+        <button class="numpad-btn" *ngFor="let num of [1,2,3,4,5,6,7,8,9]" (click)="addDigit(num)"
+            [disabled]="pin.length >= 4 || loading">
+            {{ num }}
+        </button>
+        <button class="numpad-btn special" (click)="clearPin()" [disabled]="loading">
+            ⌫
+        </button>
+        <button class="numpad-btn" (click)="addDigit(0)" [disabled]="pin.length >= 4 || loading">
+            0
+        </button>
+        <button class="numpad-btn" (click)="sendPin()" [disabled]="pin.length !== 4 || loading">
+            ✓
+        </button>
+    </div>
+
+    <!-- Botón principal -->
+    <button (click)="sendPin()" [disabled]="loading || pin.length !== 4">
+        {{ loading ? '⏳ Validando...' : '✓ Continuar' }}
     </button>
 </div>

@@ -1,4 +1,16 @@
-.container {
-    margin-top: 20px;
-    text-align: center;
+:host {
+  display: block;
+}
+
+section {
+  background: linear-gradient(135deg, #f9fbff, #eff3ff);
+}
+
+.card .p-3 {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card .p-3:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(15, 18, 63, 0.08);
 }

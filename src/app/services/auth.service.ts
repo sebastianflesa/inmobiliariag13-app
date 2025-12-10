@@ -60,12 +60,21 @@ export class AuthService {
       this.clearSession();
     }
   }
-
-  getToken() {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem(this.tokenKey);
+  
+  getToken(): Observable<string | null> {
+    if (!isPlatformBrowser(this.platformId)) {
+      return of(null);
     }
-    return null;
+
+    return this.oidcSecurityService.getAccessToken().pipe(
+      map((accessToken) => {
+        if (accessToken) {
+          localStorage.setItem(this.tokenKey, accessToken);
+          return accessToken;
+        }
+        return localStorage.getItem(this.tokenKey);
+      })
+    );
   }
 
   setToken(token: string) {

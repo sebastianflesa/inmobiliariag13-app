@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 
@@ -18,7 +18,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private subscription?: Subscription;
 
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.subscription = this.authService.userProfile$.subscribe(profile => {
@@ -34,5 +37,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   get hasProfile(): boolean {
     return !!(this.userName || this.userEmail);
+  }
+
+  logout(): void {
+    this.router.navigate(['/logout']);
   }
 }

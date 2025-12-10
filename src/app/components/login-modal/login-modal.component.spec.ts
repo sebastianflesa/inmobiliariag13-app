@@ -1,82 +1,61 @@
-import { TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { of } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
-import { ClienteService } from '../../services/cliente.service';
-
+import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { Subject } from 'rxjs';
 import { LoginComponent } from './login-modal.component';
+
+class OidcSecurityServiceMock {
+  isAuthenticated$ = new Subject<{ isAuthenticated: boolean }>();
+  userData$ = new Subject<any>();
+  authorize = jasmine.createSpy('authorize');
+  logoff = jasmine.createSpy('logoff');
+}
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
-  let authServiceSpy: any;
-  let clienteServiceSpy: any;
-  let activeModalSpy: any;
-  let routerSpy: any;
+  let fixture: ComponentFixture<LoginComponent>;
+  let activeModalSpy: jasmine.SpyObj<NgbActiveModal>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let oidcMock: OidcSecurityServiceMock;
 
   beforeEach(async () => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'setToken']);
-    authServiceSpy.login.and.returnValue(of({ token: 'token' }));
-    clienteServiceSpy = jasmine.createSpyObj('ClienteService', ['setToken']);
     activeModalSpy = jasmine.createSpyObj('NgbActiveModal', ['close']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    oidcMock = new OidcSecurityServiceMock();
 
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule],
+      imports: [LoginComponent],
       providers: [
-        { provide: AuthService, useValue: authServiceSpy },
-        { provide: ClienteService, useValue: clienteServiceSpy },
         { provide: NgbActiveModal, useValue: activeModalSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: OidcSecurityService, useValue: oidcMock },
+        { provide: PLATFORM_ID, useValue: 'browser' }
       ]
-    })
+    }).compileComponents();
 
-    component = new LoginComponent(authServiceSpy, clienteServiceSpy, activeModalSpy, routerSpy);
+    fixture = TestBed.createComponent(LoginComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debería tener un formulario inválido cuando está vacío', () => {
-    expect(component.loginForm.valid).toBeFalsy();
+  it('should trigger authorize when login is called', () => {
+    component.login();
+    expect(oidcMock.authorize).toHaveBeenCalledTimes(1);
   });
 
-  it('debería tener un formulario válido cuando se llenan todos los campos correctamente', () => {
-    component.loginForm.setValue({
-      email: 'test@example.com',
-      password: 'password'
-    });
-    expect(component.loginForm.valid).toBeTruthy();
+  it('should trigger logoff when logout is called', () => {
+    component.logout();
+    expect(oidcMock.logoff).toHaveBeenCalledTimes(1);
   });
 
-  it('debería llamar a login del AuthService cuando se envía el formulario', () => {
-    component.loginForm.setValue({
-      email: 'test@example.com',
-      password: 'password'
-    });
-    component.onSubmit();
-    expect(authServiceSpy.login).toHaveBeenCalledTimes(1);
-    expect(authServiceSpy.login).toHaveBeenCalledWith('test@example.com', 'password');
-  });
-
-  it('debería cerrar el modal después de un inicio de sesión exitoso', () => {
-    component.loginForm.setValue({
-      email: 'test@example.com',
-      password: 'password'
-    });
-    component.onSubmit();
+  it('should close modal when closeModal is called', () => {
+    component.closeModal();
     expect(activeModalSpy.close).toHaveBeenCalledTimes(1);
-  });
-
-  it('debería navegar a la página principal después de un inicio de sesión exitoso', () => {
-    component.loginForm.setValue({
-      email: 'test@example.com',
-      password: 'password'
-    });
-    component.onSubmit();
-    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
   });
 });

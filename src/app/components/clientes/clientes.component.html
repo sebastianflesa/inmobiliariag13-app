@@ -1,92 +1,208 @@
-<div class="container">
-    <h1 class="text-center">Clientes</h1>
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <!--<div class="form-group">
-                <input type="text" [(ngModel)]="rutBuscar" placeholder="Buscar por RUT" class="form-control">
-                <button class="btn btn-primary" (click)="buscarCliente()">Buscar</button>
-            </div> -->
-            <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-                {{ errorMessage }}
-            </div>
-            <ng-container *ngIf="!isLoading; else clientesLoading">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Email</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let cliente of clientes">
-                            <td>{{ cliente.nombre }}</td>
-                            <td>{{ cliente.apellido }}</td>
-                            <td>{{ cliente.email }}</td>
-                            <td>
-                                <button class="btn btn-primary" (click)="editarCliente(cliente)">Editar</button>
-                                <button class="btn btn-danger" (click)="eliminarCliente(cliente)">Eliminar</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </ng-container>
-            <ng-template #clientesLoading>
-                <div class="text-center my-4">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Cargando...</span>
-                    </div>
-                    <p class="mt-2 mb-0">Cargando clientes...</p>
-                </div>
-            </ng-template>
-            <button class="btn btn-success" (click)="mostrarFormularioCrear()">Crear Cliente</button>
-            <div *ngIf="mostrarFormulario">
-                <form [formGroup]="clienteForm">
-                    <div class="form-group">
-                        <label>RUT:</label>
-                        <input formControlName="rut" type="text" class="form-control">
-                        <div
-                            *ngIf="clienteForm.get('rut')?.invalid && (clienteForm.get('rut')?.dirty || clienteForm.get('rut')?.touched)">
-                            <div *ngIf="clienteForm.get('rut')?.errors?.['required']" class="text-danger">El RUT es
-                                requerido</div>
-                            <div *ngIf="clienteForm.get('rut')?.errors?.['pattern']" class="text-danger">El RUT debe
-                                tener un formato válido (ej: 12345678-9)</div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Nombre:</label>
-                        <input formControlName="nombre" type="text" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Apellido:</label>
-                        <input formControlName="apellido" type="text" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Email:</label>
-                        <input formControlName="email" type="email" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Teléfono:</label>
-                        <input formControlName="telefono" type="text" class="form-control">
-                        <div
-                            *ngIf="clienteForm.get('telefono')?.invalid && (clienteForm.get('telefono')?.dirty || clienteForm.get('telefono')?.touched)">
-                            <div *ngIf="clienteForm.get('telefono')?.errors?.['required']" class="text-danger">El
-                                teléfono es requerido</div>
-                            <div *ngIf="clienteForm.get('telefono')?.errors?.['pattern']" class="text-danger">El
-                                teléfono debe tener 9 dígitos</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" (click)="crearCliente()">Guardar</button>
-                    <button class="btn btn-secondary" (click)="mostrarFormulario = false">Cancelar</button>
-                </form>
-            </div>
-            <div *ngIf="clienteCreado">
-                <p>Cliente Registrado</p>
-            </div>
-            <div *ngIf="clienteEditado">
-                <p>Cliente Editado</p>
-            </div>
-        </div>
+<section class="page-shell module-wrapper">
+  <div class="container">
+    <div class="module-header">
+      <div>
+        <p class="text-uppercase text-muted small mb-1">Gestion</p>
+        <h1 class="h3 mb-0">Clientes</h1>
+        <p class="lead fs-6">Administra el directorio de clientes y actualiza sus datos en unos clics.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-outline-secondary" (click)="clienteCreado = clienteEditado = false">Limpiar alertas</button>
+        <button class="btn btn-primary" (click)="mostrarFormularioCrear()">Nuevo cliente</button>
+      </div>
     </div>
+
+    <div class="row g-4">
+      <div class="col-12" *ngIf="mostrarFormulario">
+        <div class="card module-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted small mb-1">{{ modoEdicion ? 'Edicion' : 'Alta' }}</p>
+              <h2 class="card-title h5 mb-0">{{ modoEdicion ? 'Actualizar cliente' : 'Crear cliente' }}</h2>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" (click)="mostrarFormulario = false">Cerrar</button>
+          </div>
+          <div class="card-body">
+            <form class="row g-3" [formGroup]="clienteForm">
+              <div class="col-md-4">
+                <label class="form-label">RUT</label>
+                <input formControlName="rut" type="text" class="form-control" placeholder="12345678-9" />
+                <small class="text-danger" *ngIf="clienteForm.get('rut')?.hasError('required') && clienteForm.get('rut')?.touched">
+                  El RUT es requerido
+                </small>
+                <small class="text-danger" *ngIf="clienteForm.get('rut')?.hasError('formatoInvalido')">
+                  Formato invalido (ej: 12345678-9)
+                </small>
+                <small class="text-danger" *ngIf="clienteForm.get('rut')?.hasError('rutInvalido')">
+                  El RUT no es valido
+                </small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                <input formControlName="nombre" type="text" class="form-control" placeholder="Juan" />
+                <small class="text-danger" *ngIf="clienteForm.get('nombre')?.hasError('required') && clienteForm.get('nombre')?.touched">
+                  El nombre es requerido
+                </small>
+                <small class="text-danger" *ngIf="clienteForm.get('nombre')?.hasError('minlength')">
+                  Debe tener al menos 2 caracteres
+                </small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Apellido</label>
+                <input formControlName="apellido" type="text" class="form-control" placeholder="Perez" />
+                <small class="text-danger" *ngIf="clienteForm.get('apellido')?.hasError('required') && clienteForm.get('apellido')?.touched">
+                  El apellido es requerido
+                </small>
+                <small class="text-danger" *ngIf="clienteForm.get('apellido')?.hasError('minlength')">
+                  Debe tener al menos 2 caracteres
+                </small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input formControlName="email" type="email" class="form-control" placeholder="correo@dominio.com" />
+                <small class="text-danger" *ngIf="clienteForm.get('email')?.hasError('required') && clienteForm.get('email')?.touched">
+                  El email es requerido
+                </small>
+                <small class="text-danger" *ngIf="clienteForm.get('email')?.hasError('email')">
+                  Debe ser un email valido
+                </small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Telefono</label>
+                <input formControlName="telefono" type="text" class="form-control" placeholder="987654321" />
+                <small class="text-danger" *ngIf="clienteForm.get('telefono')?.hasError('required') && clienteForm.get('telefono')?.touched">
+                  El telefono es requerido
+                </small>
+                <small class="text-danger" *ngIf="clienteForm.get('telefono')?.hasError('pattern')">
+                  Debe tener 9 digitos (ej: 987654321)
+                </small>
+              </div>
+              <div class="col-12 d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-primary" (click)="crearCliente()">
+                  {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+                </button>
+                <button type="button" class="btn btn-outline-secondary" (click)="mostrarFormulario = false">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="card module-card">
+          <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div>
+              <p class="text-muted small mb-1">Listado general</p>
+              <h2 class="card-title h5 mb-0">Clientes registrados</h2>
+            </div>
+            <span class="badge text-bg-primary-subtle text-primary">{{ clientes.length || 0 }} activos</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="text-center py-4" *ngIf="loading">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+            <ng-container *ngIf="!loading">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cliente of clientes">
+                    <td class="fw-semibold">{{ cliente.nombre }}</td>
+                    <td>{{ cliente.apellido }}</td>
+                    <td>
+                      <span class="badge text-bg-light text-primary-emphasis px-3 py-2">{{ cliente.email }}</span>
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group">
+                        <button
+                          type="button"
+                          class="btn btn-outline-primary btn-sm"
+                          (click)="editarCliente(cliente.id ?? 0, cliente)"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-danger btn-sm"
+                          (click)="eliminarCliente(cliente)"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!clientes?.length">
+                    <td colspan="4">
+                      <div class="empty-state">
+                        <p class="mb-0">Aun no hay clientes registrados.</p>
+                        <small>Usa el boton "Nuevo cliente" para agregar el primero.</small>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" *ngIf="clienteCreado || clienteEditado">
+        <div class="alert alert-success d-flex align-items-center gap-3 mb-0" role="alert">
+          <div>
+            {{ clienteCreado ? 'Cliente registrado correctamente.' : 'Cliente actualizado correctamente.' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="blocking-overlay" *ngIf="deleting">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Borrando...</span>
+      </div>
+      <h2 class="h6 mb-0">Borrando cliente</h2>
+    </div>
+    <p class="mb-1">Estamos eliminando el registro. Por favor espera...</p>
+    <p class="text-muted small mb-0">Esta ventana se cerrará al completar la operación.</p>
+  </div>
+</div>
+
+<div class="blocking-overlay" *ngIf="saving">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Guardando...</span>
+      </div>
+      <h2 class="h6 mb-0">Guardando cliente</h2>
+    </div>
+    <p class="mb-1">Estamos registrando la información del cliente.</p>
+    <p class="text-muted small mb-0">Por favor espera, estamos procesando la solicitud.</p>
+  </div>
+</div>
+
+<div class="blocking-overlay" *ngIf="errorModalMessage">
+  <div class="overlay-modal">
+    <div class="overlay-header d-flex align-items-center gap-2 mb-2">
+      <span class="text-danger fw-bold">!</span>
+      <h2 class="h6 mb-0 text-danger">No se pudo completar la operación</h2>
+    </div>
+    <p class="mb-2">{{ errorModalMessage }}</p>
+    <p class="text-muted small mb-3">El backend devolvió un error. Intenta nuevamente más tarde.</p>
+    <button type="button" class="btn btn-primary" (click)="cerrarErrorModal()">Entendido</button>
+  </div>
 </div>

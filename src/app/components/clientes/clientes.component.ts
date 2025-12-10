@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
+import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ClienteService } from '../../services/cliente.service';
 
 interface Cliente {
+  id?: number;
   rut: string;
   nombre: string;
   apellido: string;
@@ -22,20 +22,27 @@ interface Cliente {
 })
 export class ClientesComponent implements OnInit {
   clientes: Cliente[] = [];
-  isLoading = false;
-  errorMessage: string | null = null;
   clienteForm = new FormGroup({
-    rut: new FormControl('', [Validators.required, Validators.pattern(/^[0-9]{7,8}-[0-9kK]{1}$/)]),
-    nombre: new FormControl('', Validators.required),
-    apellido: new FormControl('', Validators.required),
+    rut: new FormControl('', [Validators.required, validarRut]),
+    nombre: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    apellido: new FormControl('', [Validators.required, Validators.minLength(2)]),
     email: new FormControl('', [Validators.required, Validators.email]),
-    telefono: new FormControl('', [Validators.required, Validators.pattern(/^[0-9]{9}$/)])
+    telefono: new FormControl('', [
+      Validators.required,
+      Validators.pattern(/^[0-9]{9}$/)
+    ])
   });
+
   mostrarFormulario = false;
   clienteCreado = false;
   clienteEditado = false;
   clienteSeleccionado: any = null;
   modoEdicion = false;
+  loading = false;
+  error: string | null = null;
+  deleting = false;
+  saving = false;
+  errorModalMessage: string | null = null;
 
   constructor(private clienteService: ClienteService) { }
 
@@ -46,73 +53,82 @@ export class ClientesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadClientes();
-  }
-
-  private loadClientes(onSuccess?: () => void): void {
-    this.isLoading = true;
-    this.errorMessage = null;
-    this.clienteService.getClientes()
-      .pipe(finalize(() => this.isLoading = false))
-      .subscribe({
-        next: (response: any) => {
-          console.log('Clientes obtenidos:', response);
-          this.clientes = response.data;
-          onSuccess?.();
-        },
-        error: (error: any) => {
-          console.error('Error al obtener clientes:', error);
-          this.errorMessage = 'No se pudieron cargar los clientes. Intenta nuevamente.';
-        }
-      });
+    this.loading = true;
+    this.clienteService.getClientes().subscribe({
+      next: (response: any) => {
+        console.log('Clientes obtenidos:', response);
+        this.clientes = response.data;
+        this.loading = false;
+      },
+      error: (error: any) => {
+        console.error('Error al obtener clientes:', error);
+        this.error = 'Error al cargar clientes';
+        this.loading = false;
+      }
+    });
   }
 
   crearCliente(): void {
     if (this.clienteForm.valid) {
+
       const cliente = this.clienteForm.value as Cliente;
+      this.saving = true;
+
       if (this.modoEdicion) {
         this.clienteService.editarCliente(this.clienteSeleccionado.id, cliente).subscribe({
           next: (response: any) => {
-            console.log(response);
-            this.loadClientes(() => {
+            this.clienteService.getClientes().subscribe((response: any) => {
+              this.clientes = response.data;
               this.clienteForm.reset();
               this.mostrarFormulario = false;
               this.clienteEditado = true;
-              setTimeout(() => {
-                this.clienteEditado = false;
-              }, 2000);
+              setTimeout(() => this.clienteEditado = false, 2000);
+              this.saving = false;
+            }, () => {
+              this.saving = false;
             });
           },
           error: (error: any) => {
             console.error(error);
-            this.errorMessage = 'No se pudo editar el cliente. Intenta nuevamente.';
+            this.saving = false;
+            this.errorModalMessage = 'No se pudo actualizar el cliente. Intenta nuevamente.';
           }
         });
+
       } else {
         this.clienteService.crearCliente(cliente).subscribe({
           next: (response: any) => {
-            console.log(response);
-            this.loadClientes(() => {
+            this.clienteService.getClientes().subscribe((response: any) => {
+              this.clientes = response.data;
               this.clienteForm.reset();
               this.mostrarFormulario = false;
               this.clienteCreado = true;
-              setTimeout(() => {
-                this.clienteCreado = false;
-              }, 2000);
+              setTimeout(() => this.clienteCreado = false, 2000);
+              this.saving = false;
+            }, () => {
+              this.saving = false;
             });
           },
           error: (error: any) => {
             console.error(error);
-            this.errorMessage = 'No se pudo crear el cliente. Intenta nuevamente.';
+            this.error = 'Error al crear cliente';
+            this.saving = false;
+            this.errorModalMessage = 'No se pudo crear el cliente. Revisa los datos e intenta otra vez.';
           }
         });
       }
+
     } else {
       this.clienteForm.markAllAsTouched();
     }
   }
 
-  editarCliente(cliente: any): void {
+  cerrarErrorModal(): void {
+    this.errorModalMessage = null;
+  }
+
+
+  editarCliente(id: number, cliente: Cliente): void {
     this.mostrarFormulario = true;
     this.modoEdicion = true;
     this.clienteSeleccionado = cliente;
@@ -126,39 +142,51 @@ export class ClientesComponent implements OnInit {
   }
 
   eliminarCliente(cliente: any): void {
+    if (!confirm('¿Seguro que deseas eliminar este cliente?')) {
+      return;
+    }
+
+    this.deleting = true;
     this.clienteService.eliminarCliente(cliente.id).subscribe({
-      next: () => this.loadClientes(),
-      error: (error) => {
-        console.error(error);
-        this.errorMessage = 'No se pudo eliminar el cliente. Intenta nuevamente.';
+      next: () => {
+        this.clienteService.getClientes().subscribe((response: any) => {
+          this.clientes = response.data;
+          this.deleting = false;
+        }, () => {
+          this.deleting = false;
+        });
+      },
+      error: (error: any) => {
+        console.error('Error al eliminar cliente:', error);
+        this.error = 'Error al eliminar cliente';
+        this.deleting = false;
       }
     });
   }
+}
 
-  rutBuscar = '';
+// ---- VALIDACIÓN REAL DE RUT ----
+function validarRut(control: AbstractControl): ValidationErrors | null {
+  const rut = control.value?.toString().trim();
+  if (!rut) return { required: true };
 
-  /*buscarCliente(): void {
-    if (this.rutBuscar) {
-      this.clienteService.getClientePorRut(this.rutBuscar).subscribe({
-        next: (response: any) => {
-          console.log(response);
-          if (response) {
-            this.clientes = [response];
-          } else {
-            this.clientes = [];
-          }
-        },
-        error: (error: any) => {
-          console.error(error);
-          this.clientes = [];
-        }
-      });
-    } else {
-      this.clienteService.getClientes().subscribe((response: any) => {
-        console.log(response);
-        this.clientes = response.data;
-      });
-    }
+  const rutRegex = /^[0-9]+-[0-9kK]{1}$/;
+  if (!rutRegex.test(rut)) return { formatoInvalido: true };
+
+  const [cuerpo, dv] = rut.split('-');
+  let suma = 0;
+  let multiplo = 2;
+
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+    suma += parseInt(cuerpo[i], 10) * multiplo;
+    multiplo = multiplo < 7 ? multiplo + 1 : 2;
   }
-    */
+
+  const dvEsperado = 11 - (suma % 11);
+  const dvCalculado =
+    dvEsperado === 11 ? '0' :
+      dvEsperado === 10 ? 'k' :
+        dvEsperado.toString();
+
+  return dv.toLowerCase() === dvCalculado ? null : { rutInvalido: true };
 }

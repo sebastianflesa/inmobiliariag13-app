@@ -3,7 +3,7 @@ export const oidcConfig = {
   clientId: '53m5nqdko6io2kcc1upke47vc6',
   redirectUrl: 'http://localhost:4200/auth/callback',
   postLogoutRedirectUri: 'http://localhost:4200/auth/logout-callback',
-  scope: 'email openid phone',
+  scope: 'email openid',
   responseType: 'code',
   useRefreshToken: true,
   renewTimeBeforeTokenExpiresInSeconds: 60
