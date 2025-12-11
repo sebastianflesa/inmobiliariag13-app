@@ -70,12 +70,12 @@
               </div>
               <div class="col-md-4">
                 <label class="form-label">Monto total</label>
-                <input type="number" formControlName="monto_total" class="form-control" min="1000000" />
+                <input type="number" formControlName="monto_total" class="form-control" min="100000" placeholder="100.000"/>
                 <small class="text-danger" *ngIf="contratoForm.get('monto_total')?.hasError('required') && contratoForm.get('monto_total')?.touched">
                   El monto es requerido
                 </small>
                 <small class="text-danger" *ngIf="contratoForm.get('monto_total')?.hasError('min') && contratoForm.get('monto_total')?.touched">
-                  Debe ser mayor a 0
+                  Debe ser mayor a 100.000
                 </small>
               </div>
               <div class="col-md-4">

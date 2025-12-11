@@ -30,7 +30,7 @@ export class OtpScreenComponent implements OnDestroy {
     this.loading = true;
     this.otp = ''; // Limpiar input anterior
     
-    this.http.post<any>(`http://127.0.0.1:8000/api/pagos/${this.sessionId}/otp`, {})
+    this.http.post<any>(`http://98.94.165.186:8000/api/pagos/${this.sessionId}/otp`, {})
       .subscribe({
         next: res => {
           this.loading = false;
@@ -65,7 +65,7 @@ export class OtpScreenComponent implements OnDestroy {
 
     this.loading = true;
     
-    this.http.post<any>(`http://127.0.0.1:8000/api/pagos/${this.sessionId}/otp/validar`, {
+    this.http.post<any>(`http://98.94.165.186:8000/api/pagos/${this.sessionId}/otp/validar`, {
       otp: cleanOtp
     }).subscribe({
       next: res => {

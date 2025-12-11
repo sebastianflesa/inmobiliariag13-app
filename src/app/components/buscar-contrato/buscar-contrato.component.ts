@@ -30,7 +30,7 @@ export class BuscarContratoComponent {
     this.errorMsg = '';
     this.loading = true;
 
-    this.http.get(`http://127.0.0.1:8000/api/contratos/buscar-rut/${this.rut}`)
+    this.http.get(`http://98.94.165.186:8000/api/contratos/buscar-rut/${this.rut}`)
       .subscribe({
         next: (response: any) => {
           this.loading = false;

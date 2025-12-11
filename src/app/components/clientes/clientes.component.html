@@ -26,7 +26,7 @@
             <form class="row g-3" [formGroup]="clienteForm">
               <div class="col-md-4">
                 <label class="form-label">RUT</label>
-                <input formControlName="rut" type="text" class="form-control" placeholder="12345678-9" />
+                <input formControlName="rut" type="text" class="form-control" placeholder="Ej: 12345678-9" />
                 <small class="text-danger" *ngIf="clienteForm.get('rut')?.hasError('required') && clienteForm.get('rut')?.touched">
                   El RUT es requerido
                 </small>
@@ -39,7 +39,7 @@
               </div>
               <div class="col-md-4">
                 <label class="form-label">Nombre</label>
-                <input formControlName="nombre" type="text" class="form-control" placeholder="Juan" />
+                <input formControlName="nombre" type="text" class="form-control" placeholder="Ej: Juan" />
                 <small class="text-danger" *ngIf="clienteForm.get('nombre')?.hasError('required') && clienteForm.get('nombre')?.touched">
                   El nombre es requerido
                 </small>
@@ -49,7 +49,7 @@
               </div>
               <div class="col-md-4">
                 <label class="form-label">Apellido</label>
-                <input formControlName="apellido" type="text" class="form-control" placeholder="Perez" />
+                <input formControlName="apellido" type="text" class="form-control" placeholder="Ej: Pérez" />
                 <small class="text-danger" *ngIf="clienteForm.get('apellido')?.hasError('required') && clienteForm.get('apellido')?.touched">
                   El apellido es requerido
                 </small>
@@ -59,7 +59,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Email</label>
-                <input formControlName="email" type="email" class="form-control" placeholder="correo@dominio.com" />
+                <input formControlName="email" type="email" class="form-control" placeholder="Ej: correo@dominio.com" />
                 <small class="text-danger" *ngIf="clienteForm.get('email')?.hasError('required') && clienteForm.get('email')?.touched">
                   El email es requerido
                 </small>
@@ -69,7 +69,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Telefono</label>
-                <input formControlName="telefono" type="text" class="form-control" placeholder="987654321" />
+                <input formControlName="telefono" type="text" class="form-control" placeholder="Ej: 987654321" />
                 <small class="text-danger" *ngIf="clienteForm.get('telefono')?.hasError('required') && clienteForm.get('telefono')?.touched">
                   El telefono es requerido
                 </small>

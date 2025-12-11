@@ -23,7 +23,7 @@ export class NeonCardComponent {
 
     this.loading = true;
 
-    this.http.post<any>(`http://127.0.0.1:8000/api/pagos/${this.contratoId}/init`, {})
+    this.http.post<any>(`http://98.94.165.186:8000/api/pagos/${this.contratoId}/init`, {})
       .subscribe({
         next: res => {
           this.loading = false;

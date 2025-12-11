@@ -16,7 +16,7 @@ export interface Cliente {
 })
 export class ClienteService {
 
-  private apiUrl = 'http://localhost:8000/api/clientes';
+  private apiUrl = 'http://98.94.165.186:8000/api/clientes';
   private readonly tokenKey = 'token';
   private token: string | null = null;
 

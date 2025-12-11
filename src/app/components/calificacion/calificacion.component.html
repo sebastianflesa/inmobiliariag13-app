@@ -23,7 +23,7 @@
               <div class="col-md-6">
                 <label class="form-label">Contrato</label>
                 <select class="form-select" formControlName="contrato_id">
-                  <option value="">Seleccione...</option>
+                  <option value="" disabled [selected]="!califForm.get('contrato_id')?.value">Selecciona el contrato</option>
                   <option *ngFor="let c of contratos" [value]="c.id">
                     {{ c.cliente?.nombre ? (c.cliente.nombre + ' ' + (c.cliente.apellido || '')) : (c.cliente_id || 'Contrato ' + c.id) }} -
                     {{ c.unidad?.numero_unidad ? c.unidad.numero_unidad : (c.unidad_id || '') }}
@@ -63,7 +63,7 @@
               <input type="hidden" formControlName="proyecto_id" />
               <div class="col-12">
                 <label class="form-label">Comentario (opcional)</label>
-                <textarea formControlName="comentario" rows="3" class="form-control"></textarea>
+                <textarea formControlName="comentario" rows="3" class="form-control" placeholder="Ej: Buen servicio, entrega puntual y respuesta rápida."></textarea>
               </div>
               <div class="col-12" *ngIf="error">
                 <div class="alert alert-danger">{{ error }}</div>

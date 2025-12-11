@@ -9,7 +9,7 @@ import { catchError } from 'rxjs/operators';
 })
 export class ProyectoService {
 
-  private apiUrl = 'http://localhost:8000/api/proyectos';
+  private apiUrl = 'http://98.94.165.186:8000/api/proyectos';
   private token: string | null = null;
 
   constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {

@@ -22,15 +22,15 @@
             <form class="row g-3" [formGroup]="unidadForm">
               <div class="col-md-4">
                 <label class="form-label">Numero de unidad</label>
-                <input formControlName="numero_unidad" type="text" class="form-control" />
+                <input formControlName="numero_unidad" type="text" class="form-control" placeholder="Ej: C101" />
                 <small class="text-danger" *ngIf="unidadForm.get('numero_unidad')?.hasError('required') && unidadForm.get('numero_unidad')?.touched">
                   El número de unidad es requerido
                 </small>
               </div>
               <div class="col-md-4">
                 <label class="form-label">Tipo</label>
-                <select formControlName="tipo_unidad" class="form-select">
-                  <option value="">Seleccione tipo</option>
+                <select formControlName="tipo_unidad" class="form-select" aria-label="Tipo de unidad" required>
+                  <option value="" disabled [selected]="!unidadForm.get('tipo_unidad')?.value">Selecciona el tipo de unidad</option>
                   <option value="Departamento">Departamento</option>
                   <option value="Casa">Casa</option>
                   <option value="Parcela">Parcela</option>
@@ -44,7 +44,7 @@
               </div>
               <div class="col-md-4">
                 <label class="form-label">Metraje (m)</label>
-                <input formControlName="metraje" type="number" class="form-control" min="1" />
+                <input formControlName="metraje" type="number" class="form-control" min="1" placeholder="Ej: 85" />
                 <small class="text-danger" *ngIf="unidadForm.get('metraje')?.hasError('required') && unidadForm.get('metraje')?.touched">
                   El metraje es requerido
                 </small>
@@ -54,18 +54,18 @@
               </div>
               <div class="col-md-4">
                 <label class="form-label">Precio de venta</label>
-                <input formControlName="precio_venta" type="number" class="form-control" min="1000000" />
+                <input formControlName="precio_venta" type="number" class="form-control" min="1000000" placeholder="Ej: 120000000" />
                 <small class="text-danger" *ngIf="unidadForm.get('precio_venta')?.hasError('required') && unidadForm.get('precio_venta')?.touched">
                   El precio de venta es requerido
                 </small>
                 <small class="text-danger" *ngIf="(unidadForm.get('precio_venta')?.hasError('min') || unidadForm.get('precio_venta')?.hasError('pattern')) && unidadForm.get('precio_venta')?.touched">
-                  Debe ser un número mayor a 0
+                  Debe ser un número mayor a 1.000.000
                 </small>
               </div>
               <div class="col-md-4">
                 <label class="form-label">Estado</label>
                 <select formControlName="estado" class="form-select">
-                  <option value="">Seleccione estado</option>
+                  <option value="" disabled [selected]="!unidadForm.get('estado')?.value">Selecciona el estado</option>
                   <option value="Disponible">Disponible</option>
                   <option value="Reservado">Reservado</option>
                   <option value="Vendido">Vendido</option>
@@ -77,7 +77,7 @@
               <div class="col-md-4">
                 <label class="form-label">Proyecto</label>
                 <select formControlName="proyecto_id" class="form-select">
-                  <option value="">Seleccione proyecto</option>
+                  <option value="" disabled [selected]="!unidadForm.get('proyecto_id')?.value">Selecciona el proyecto</option>
                   <option *ngFor="let proyecto of proyectos" [value]="proyecto.id">{{ proyecto.nombre }}</option>
                 </select>
                 <small class="text-danger" *ngIf="unidadForm.get('proyecto_id')?.hasError('required') && unidadForm.get('proyecto_id')?.touched">
@@ -87,7 +87,7 @@
               <div class="col-md-6">
                 <label class="form-label">Cliente</label>
                 <select formControlName="cliente_id" class="form-select">
-                  <option value="">Sin cliente</option>
+                  <option value="" disabled [selected]="!unidadForm.get('cliente_id')?.value">Sin cliente (opcional)</option>
                   <option *ngFor="let cliente of clientes" [value]="cliente.id">
                     {{ cliente.rut }} - {{ cliente.nombre }} {{ cliente.apellido }}
                   </option>

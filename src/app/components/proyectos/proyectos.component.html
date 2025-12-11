@@ -20,7 +20,7 @@
             <form class="row g-3" [formGroup]="proyectoForm">
               <div class="col-md-6">
                 <label class="form-label">Nombre</label>
-                <input formControlName="nombre" type="text" class="form-control" />
+                <input formControlName="nombre" type="text" class="form-control" placeholder="Ej: Parque Central" />
                 <small class="text-danger" *ngIf="proyectoForm.get('nombre')?.hasError('required') && proyectoForm.get('nombre')?.touched">
                   El nombre es requerido
                 </small>
@@ -30,7 +30,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Descripcion</label>
-                <input formControlName="descripcion" type="text" class="form-control" />
+                <input formControlName="descripcion" type="text" class="form-control" placeholder="Ej: Condominio con áreas verdes y cowork" />
                 <small class="text-danger" *ngIf="proyectoForm.get('descripcion')?.hasError('required') && proyectoForm.get('descripcion')?.touched">
                   La descripcion es requerida
                 </small>
@@ -40,7 +40,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Ubicacion</label>
-                <input formControlName="ubicacion" type="text" class="form-control" />
+                <input formControlName="ubicacion" type="text" class="form-control" placeholder="Ej: Las Condes, Santiago" />
                 <small class="text-danger" *ngIf="proyectoForm.get('ubicacion')?.hasError('required') && proyectoForm.get('ubicacion')?.touched">
                   La ubicacion es requerida
                 </small>
@@ -50,14 +50,14 @@
               </div>
               <div class="col-md-3">
                 <label class="form-label">Fecha inicio</label>
-                <input formControlName="fecha_inicio" type="date" class="form-control" />
+                <input formControlName="fecha_inicio" type="date" class="form-control" placeholder="Selecciona fecha de inicio" />
                 <small class="text-danger" *ngIf="proyectoForm.get('fecha_inicio')?.hasError('required') && proyectoForm.get('fecha_inicio')?.touched">
                   La fecha de inicio es requerida
                 </small>
               </div>
               <div class="col-md-3">
                 <label class="form-label">Fecha fin</label>
-                <input formControlName="fecha_fin" type="date" class="form-control" />
+                <input formControlName="fecha_fin" type="date" class="form-control" placeholder="Selecciona fecha de término" />
                 <small class="text-danger" *ngIf="proyectoForm.get('fecha_fin')?.hasError('required') && proyectoForm.get('fecha_fin')?.touched">
                   La fecha de fin es requerida
                 </small>
@@ -65,6 +65,7 @@
               <div class="col-md-4">
                 <label class="form-label">Estado</label>
                 <select formControlName="estado" class="form-select">
+                  <option value="" disabled [selected]="!proyectoForm.get('estado')?.value">Selecciona el estado</option>
                   <option value="En construccion">En construccion</option>
                   <option value="En planificacion">En planificacion</option>
                   <option value="Terminado">Terminado</option>

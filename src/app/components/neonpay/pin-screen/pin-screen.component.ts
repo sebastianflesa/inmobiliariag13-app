@@ -25,7 +25,7 @@ export class PinScreenComponent {
 
     this.loading = true;
 
-    this.http.post<any>(`http://127.0.0.1:8000/api/pagos/${this.sessionId}/pin`, {
+    this.http.post<any>(`http://98.94.165.186:8000/api/pagos/${this.sessionId}/pin`, {
       pin: this.pin
     }).subscribe({
       next: res => {

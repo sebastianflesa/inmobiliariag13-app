@@ -18,7 +18,7 @@ export interface Pago {
 })
 export class PagoService {
 
-  private base = 'http://localhost:8000/api';
+  private base = 'http://98.94.165.186:8000/api';
 
   constructor(private http: HttpClient) { }
 
